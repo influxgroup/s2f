@@ -1,25 +1,31 @@
 import React, { useState } from 'react';
 import { mockTalentPool } from '../data/mockTalent';
 import { Search, ShieldCheck, ExternalLink, Award, MapPin, Clock, X } from 'lucide-react';
+import { useCms } from '../context/CmsContext';
 
 export default function TalentPoolExplorer({ openDiscoveryModal }) {
+  const { content } = useCms();
+  const talentList = content?.talent && content.talent.length > 0 ? content.talent : mockTalentPool;
+
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedSeniority, setSelectedSeniority] = useState('All');
   const [selectedAvailability, setSelectedAvailability] = useState('All');
   const [selectedTalentModal, setSelectedTalentModal] = useState(null);
 
-  const filteredTalent = mockTalentPool.filter(t => {
+  const filteredTalent = talentList.filter(t => {
     const matchesSearch =
       t.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
       t.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      t.primaryStack.some(s => s.toLowerCase().includes(searchTerm.toLowerCase())) ||
-      t.country.toLowerCase().includes(searchTerm.toLowerCase());
+      (Array.isArray(t.primaryStack) && t.primaryStack.some(s => s.toLowerCase().includes(searchTerm.toLowerCase()))) ||
+      (typeof t.primaryStack === 'string' && t.primaryStack.toLowerCase().includes(searchTerm.toLowerCase())) ||
+      (t.country && t.country.toLowerCase().includes(searchTerm.toLowerCase()));
 
     const matchesSeniority = selectedSeniority === 'All' || t.seniority === selectedSeniority;
     const matchesAvailability = selectedAvailability === 'All' || t.availabilityCode === selectedAvailability;
 
     return matchesSearch && matchesSeniority && matchesAvailability;
   });
+
 
   return (
     <section className="py-16 px-4 lg:px-8 bg-sage-banner min-h-[85vh] text-[#0f1d31] relative">

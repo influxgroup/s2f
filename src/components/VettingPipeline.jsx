@@ -1,8 +1,20 @@
 import React, { useState } from 'react';
 import { vettingStageDetails } from '../data/mockTalent';
 import { CheckCircle2, ShieldCheck, Code2, Cpu, MessageSquareCheck, FileCheck, ChevronRight, Zap } from 'lucide-react';
+import { useCms } from '../context/CmsContext';
 
 export default function VettingPipeline({ setActiveTab, openDiscoveryModal }) {
+  const { content } = useCms();
+  const stages = (content?.vetting && content.vetting.length > 0)
+    ? content.vetting.map((v, i) => ({
+        ...v,
+        stage: v.stage || i + 1,
+        evaluationFocus: v.evaluationFocus || v.description,
+        toolsUsed: v.toolsUsed || 'GitHub, Docker, LeetCode Hard, AWS Sandbox',
+        iconName: vettingStageDetails[i]?.iconName || 'FileCheck'
+      }))
+    : vettingStageDetails;
+
   const [selectedStage, setSelectedStage] = useState(0);
 
   const iconMap = {
@@ -12,6 +24,7 @@ export default function VettingPipeline({ setActiveTab, openDiscoveryModal }) {
     MessageSquareCheck,
     ShieldCheck
   };
+
 
   return (
     <section className="py-14 sm:py-20 px-3 sm:px-6 lg:px-8 bg-white border-b border-[#b8c8e0] w-full max-w-full overflow-hidden">
@@ -33,7 +46,8 @@ export default function VettingPipeline({ setActiveTab, openDiscoveryModal }) {
 
         {/* 5-Stage Horizontal Visual Funnel */}
         <div className="grid grid-cols-1 md:grid-cols-5 gap-3">
-          {vettingStageDetails.map((stageObj, idx) => {
+          {stages.map((stageObj, idx) => {
+
             const isSelected = selectedStage === idx;
 
             return (
@@ -85,21 +99,22 @@ export default function VettingPipeline({ setActiveTab, openDiscoveryModal }) {
           <div className="lg:col-span-7 space-y-6">
             <div className="flex items-center gap-3">
               <span className="w-12 h-12 rounded-2xl bg-[#2563eb]/30 text-blue-300 flex items-center justify-center border border-[#2563eb]/50 text-xl font-extrabold">
-                0{vettingStageDetails[selectedStage].stage}
+                0{stages[selectedStage]?.stage || selectedStage + 1}
               </span>
               <div>
                 <span className="text-xs font-extrabold text-[#60a5fa] uppercase tracking-widest">
                   Vetting Protocol Filter
                 </span>
                 <h3 className="text-2xl font-extrabold text-white font-heading">
-                  {vettingStageDetails[selectedStage].title}
+                  {stages[selectedStage]?.title}
                 </h3>
               </div>
             </div>
 
             <p className="text-slate-200 text-base leading-relaxed font-normal">
-              {vettingStageDetails[selectedStage].description}
+              {stages[selectedStage]?.description}
             </p>
+
 
             <div className="bg-[#0a1628] p-5 rounded-2xl border border-[#2d4d38] space-y-3">
               <p className="text-xs font-bold text-slate-200 uppercase tracking-wider flex items-center gap-2">

@@ -1,57 +1,19 @@
 import React from 'react';
 import { Cloud, Code2, Cpu, ShieldCheck, CheckCircle2, ArrowRight, Layers, Users, Sparkles, ChevronRight, Monitor, ShoppingBag, Wheat } from 'lucide-react';
+import { useCms } from '../context/CmsContext';
+
+const iconMap = {
+  'flutter-mobile': Code2,
+  'laravel-php': Layers,
+  'python-django-ai': Cpu,
+  'aws-devops': Cloud,
+  'cybersecurity': ShieldCheck,
+  'react-fullstack': Monitor,
+};
 
 export default function ServicesPage({ setActiveTab, openDiscoveryModal }) {
-  const serviceOfferings = [
-    {
-      id: 'flutter-mobile',
-      icon: Code2,
-      title: 'Flutter & React Native Cross-Platform Mobile Apps',
-      badge: 'iOS & Android',
-      tagline: 'High-performance Flutter and React Native mobile applications with offline SQLite sync, BLoC state management, and native device plugins.',
-      image: 'https://images.unsplash.com/photo-1512941937669-90a1b58e7e9c?auto=format&fit=crop&w=600&q=80'
-    },
-    {
-      id: 'laravel-php',
-      icon: Layers,
-      title: 'PHP & Laravel Enterprise SaaS Engineering',
-      badge: 'Backend Architecture',
-      tagline: 'Scalable PHP and Laravel REST APIs, Inertia.js microservices, payment gateways (Stripe, Paystack), and high-concurrency MySQL/Redis databases.',
-      image: 'https://images.unsplash.com/photo-1555066931-4365d14bab8c?auto=format&fit=crop&w=600&q=80'
-    },
-    {
-      id: 'python-django-ai',
-      icon: Cpu,
-      title: 'Python, Django & AI RAG LLM Workflows',
-      badge: 'AI & Automation',
-      tagline: 'Python FastAPI async engines, Django REST frameworks, LangChain GenAI RAG pipelines, and automated background workers with Celery & Redis.',
-      image: 'https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?auto=format&fit=crop&w=600&q=80'
-    },
-    {
-      id: 'aws-devops',
-      icon: Cloud,
-      title: 'AWS Cloud Architecture, DevOps & Kubernetes',
-      badge: 'Cloud & Infrastructure',
-      tagline: 'AWS EKS Kubernetes clusters, Infrastructure-as-Code (Terraform), Serverless AWS Lambda microservices, and automated zero-downtime CI/CD pipelines.',
-      image: 'https://images.unsplash.com/photo-1451187580459-43490279c0fa?auto=format&fit=crop&w=600&q=80'
-    },
-    {
-      id: 'cybersecurity',
-      icon: ShieldCheck,
-      title: 'Cybersecurity Assessments & Code Hardening',
-      badge: 'ISO 27001 & OWASP',
-      tagline: 'Vulnerability assessments, OWASP code remediation, penetration testing, security auditing, and anonymous whistleblower portals.',
-      image: 'https://images.unsplash.com/photo-1563986768609-322da13575f3?auto=format&fit=crop&w=600&q=80'
-    },
-    {
-      id: 'react-fullstack',
-      icon: Monitor,
-      title: 'React.js, Next.js & Modern Web Platforms',
-      badge: 'Frontend Excellence',
-      tagline: 'Ultra-fast React and Next.js web applications, complex Redux/Zustand state management, and high-converting enterprise portals.',
-      image: 'https://images.unsplash.com/photo-1556742049-0a6756574358?auto=format&fit=crop&w=600&q=80'
-    }
-  ];
+  const { content } = useCms();
+  const servicesList = content?.services && content.services.length > 0 ? content.services : [];
 
   return (
     <section className="py-10 px-4 lg:px-8 bg-gradient-to-b from-[#edf1f7] via-[#e2eaf5] to-[#edf1f7] text-[#0f1d31] min-h-[85vh] relative">
@@ -73,8 +35,8 @@ export default function ServicesPage({ setActiveTab, openDiscoveryModal }) {
 
         {/* Unique Asymmetric Horizontal Micro-Cards Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 lg:gap-5 max-w-6xl mx-auto">
-          {serviceOfferings.map((service) => {
-            const IconComponent = service.icon;
+          {servicesList.map((service) => {
+            const IconComponent = iconMap[service.id] || Layers;
             return (
               <div
                 key={service.id}
@@ -101,6 +63,11 @@ export default function ServicesPage({ setActiveTab, openDiscoveryModal }) {
                     <span className="text-[9px] font-extrabold bg-blue-50 text-[#1d4ed8] px-2 py-0.5 rounded-md uppercase tracking-wider border border-blue-200/70">
                       {service.badge}
                     </span>
+                    {service.rate && (
+                      <span className="text-[9px] font-mono font-semibold text-slate-500">
+                        {service.rate}
+                      </span>
+                    )}
                   </div>
 
                   <h3 className="font-extrabold text-[#0f1d31] text-sm sm:text-base font-heading group-hover:text-[#1d4ed8] transition-colors truncate">
@@ -121,6 +88,7 @@ export default function ServicesPage({ setActiveTab, openDiscoveryModal }) {
             );
           })}
         </div>
+
 
         {/* Bottom Squad Calculator Banner */}
         <div className="p-4 sm:p-5 rounded-2xl bg-white/95 backdrop-blur-xl text-[#0f1d31] border border-blue-200/80 flex flex-col sm:flex-row items-center justify-between gap-4 shadow-md max-w-6xl mx-auto">

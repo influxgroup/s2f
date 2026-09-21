@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Shield, ArrowRight, Sparkles, Star, Users, Lock, Clock, Zap } from 'lucide-react';
 import heroUserNoBg from '../assets/hero_user_nobg.png';
+import { useCms } from '../context/CmsContext';
 
 /* ─── Animated Counter Hook ─── */
 function useCountUp(target, duration = 2000) {
@@ -33,6 +34,9 @@ function useCountUp(target, duration = 2000) {
 }
 
 export default function HeroSection({ setActiveTab, openDiscoveryModal }) {
+  const { content } = useCms();
+  const hero = content?.hero || {};
+
   return (
     <section className="relative text-[#0f1d31] overflow-hidden border-b border-[#b8c8e0] bg-[#e4edf8] w-full max-w-full flex flex-col justify-between pt-6 sm:pt-10 lg:pt-12">
 
@@ -46,18 +50,35 @@ export default function HeroSection({ setActiveTab, openDiscoveryModal }) {
             {/* Functional Status Pill */}
             <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-blue-100/90 border border-blue-200/80 text-blue-900 text-xs font-semibold shadow-xs">
               <span className="w-2 h-2 rounded-full bg-blue-600 animate-pulse" />
-              <span>Available for Q3/Q4 Enterprise Engagements</span>
+              <span>{hero.statusPill || 'Available for Q3/Q4 Enterprise Engagements'}</span>
             </div>
 
             {/* Main Headline */}
             <h1 className="text-3xl sm:text-4xl md:text-5xl xl:text-[52px] font-extrabold text-[#0f1d31] tracking-tight leading-[1.14] font-heading break-words max-w-xl">
-              Dedicated Software Engineering Squads for <span className="text-blue-700">Growing Tech Teams.</span>
+              {hero.headline ? (
+                <>
+                  {hero.headlineHighlight && hero.headline.includes(hero.headlineHighlight) ? (
+                    <>
+                      {hero.headline.split(hero.headlineHighlight)[0]}
+                      <span className="text-blue-700">{hero.headlineHighlight}</span>
+                      {hero.headline.split(hero.headlineHighlight)[1]}
+                    </>
+                  ) : (
+                    hero.headline
+                  )}
+                </>
+              ) : (
+                <>
+                  Dedicated Software Engineering Squads for <span className="text-blue-700">Growing Tech Teams.</span>
+                </>
+              )}
             </h1>
 
             {/* Supporting Copy */}
             <p className="text-sm sm:text-base text-slate-700 max-w-lg leading-relaxed font-normal mx-auto lg:mx-0">
-              Sovereign2Fresh Empire connects companies with pre-vetted software engineers, DevSecOps leads, and systems architects. Build secure React applications, AI solutions, and enterprise cloud infrastructure.
+              {hero.subheadline || 'Sovereign2Fresh Empire connects companies with pre-vetted software engineers, DevSecOps leads, and systems architects. Build secure React applications, AI solutions, and enterprise cloud infrastructure.'}
             </p>
+
 
             {/* Action Buttons / CTAs */}
             <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-center lg:justify-start gap-3 pt-1 w-full">
@@ -65,7 +86,7 @@ export default function HeroSection({ setActiveTab, openDiscoveryModal }) {
                 onClick={openDiscoveryModal}
                 className="w-full sm:w-auto px-6 py-3.5 rounded-xl bg-[#0f172a] text-white font-semibold text-xs sm:text-sm hover:bg-[#1e293b] transition-colors flex items-center justify-center gap-2 cursor-pointer shadow-sm active:scale-95"
               >
-                <span>Book a Consultation</span>
+                <span>{hero.primaryCta || 'Book a Consultation'}</span>
                 <ArrowRight className="w-4 h-4 text-blue-400" />
               </button>
 
@@ -73,7 +94,7 @@ export default function HeroSection({ setActiveTab, openDiscoveryModal }) {
                 onClick={() => setActiveTab('calculator')}
                 className="w-full sm:w-auto px-6 py-3.5 rounded-xl bg-white text-slate-800 font-semibold text-xs sm:text-sm hover:bg-slate-50 transition-colors border border-slate-300 flex items-center justify-center gap-2 cursor-pointer shadow-sm active:scale-95"
               >
-                <span>Calculate Squad Retainer</span>
+                <span>{hero.secondaryCta || 'Calculate Squad Retainer'}</span>
               </button>
             </div>
 
@@ -92,7 +113,7 @@ export default function HeroSection({ setActiveTab, openDiscoveryModal }) {
                   <Star className="w-3.5 h-3.5 fill-amber-500" />
                   <Star className="w-3.5 h-3.5 fill-amber-500" />
                 </div>
-                <span className="text-[#0f1d31]">Trusted by 40+ Enterprise CTOs (4.9/5)</span>
+                <span className="text-[#0f1d31]">{hero.socialProofText || 'Trusted by 40+ Enterprise CTOs (4.9/5)'}</span>
               </div>
             </div>
 
@@ -112,7 +133,7 @@ export default function HeroSection({ setActiveTab, openDiscoveryModal }) {
 
       {/* ─── BOTTOM COUNTER RIBBON ─── */}
       <div className="relative z-20 px-3 sm:px-6 lg:px-12 pt-6 pb-6 sm:pb-8 w-full max-w-full">
-        <FancyCounterRibbon />
+        <FancyCounterRibbon hero={hero} />
       </div>
 
     </section>
@@ -120,11 +141,11 @@ export default function HeroSection({ setActiveTab, openDiscoveryModal }) {
 }
 
 /* ─── Responsive Animated Counter Ribbon ─── */
-function FancyCounterRibbon() {
-  const engineers = useCountUp(180, 2200);
-  const retention = useCountUp(90, 2000);
-  const sprints = useCountUp(10, 1800);
-  const hours = useCountUp(48, 1600);
+function FancyCounterRibbon({ hero = {} }) {
+  const engineers = useCountUp(hero.metricEngineers ?? 180, 2200);
+  const retention = useCountUp(hero.metricRetention ?? 90, 2000);
+  const sprints = useCountUp(hero.metricSprints ?? 10, 1800);
+  const hours = useCountUp(hero.metricSlaHours ?? 48, 1600);
 
   return (
     <div className="max-w-7xl mx-auto w-full">
@@ -161,6 +182,7 @@ function FancyCounterRibbon() {
           </div>
           <p className="text-[10px] sm:text-[11px] text-slate-600 mt-0.5 sm:mt-1 font-semibold text-center">Replacement SLA</p>
         </div>
+
 
       </div>
     </div>

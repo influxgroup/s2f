@@ -77,9 +77,110 @@ export async function subscribeNewsletter(email, source = 'website') {
   });
 }
 
+/**
+ * Admin Authentication
+ */
+export async function loginAdmin(email, password) {
+  return request('/auth/login', {
+    method: 'POST',
+    body: JSON.stringify({ email, password }),
+  });
+}
+
+/**
+ * Fetch all CMS sections
+ */
+export async function fetchCmsContent() {
+  return request('/content', { method: 'GET' });
+}
+
+/**
+ * Save single CMS section (protected)
+ */
+export async function saveCmsSection(key, data, token) {
+  return request(`/admin/content/${key}`, {
+    method: 'POST',
+    headers: token ? { Authorization: `Bearer ${token}` } : {},
+    body: JSON.stringify({ data }),
+  });
+}
+
+/**
+ * Bulk save all CMS sections (protected)
+ */
+export async function bulkSaveCms(sections, token) {
+  return request('/admin/content', {
+    method: 'POST',
+    headers: token ? { Authorization: `Bearer ${token}` } : {},
+    body: JSON.stringify({ sections }),
+  });
+}
+
+/**
+ * Fetch inquiries for admin dashboard
+ */
+export async function fetchAdminInquiries(token) {
+  return request('/admin/inquiries', {
+    method: 'GET',
+    headers: token ? { Authorization: `Bearer ${token}` } : {},
+  });
+}
+
+/**
+ * Update inquiry status
+ */
+export async function updateInquiryStatus(id, status, token) {
+  return request(`/admin/inquiries/${id}/status`, {
+    method: 'PATCH',
+    headers: token ? { Authorization: `Bearer ${token}` } : {},
+    body: JSON.stringify({ status }),
+  });
+}
+
+/**
+ * Fetch consultations for admin dashboard
+ */
+export async function fetchAdminConsultations(token) {
+  return request('/admin/consultations', {
+    method: 'GET',
+    headers: token ? { Authorization: `Bearer ${token}` } : {},
+  });
+}
+
+/**
+ * Update consultation status
+ */
+export async function updateConsultationStatus(id, status, token) {
+  return request(`/admin/consultations/${id}/status`, {
+    method: 'PATCH',
+    headers: token ? { Authorization: `Bearer ${token}` } : {},
+    body: JSON.stringify({ status }),
+  });
+}
+
+/**
+ * Fetch subscribers for admin dashboard
+ */
+export async function fetchAdminSubscribers(token) {
+  return request('/admin/subscribers', {
+    method: 'GET',
+    headers: token ? { Authorization: `Bearer ${token}` } : {},
+  });
+}
+
 export default {
   checkApiHealth,
   submitInquiry,
   bookConsultation,
   subscribeNewsletter,
+  loginAdmin,
+  fetchCmsContent,
+  saveCmsSection,
+  bulkSaveCms,
+  fetchAdminInquiries,
+  updateInquiryStatus,
+  fetchAdminConsultations,
+  updateConsultationStatus,
+  fetchAdminSubscribers,
 };
+

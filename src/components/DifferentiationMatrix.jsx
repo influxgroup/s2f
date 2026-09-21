@@ -1,8 +1,17 @@
 import React from 'react';
 import { Check, X, ShieldAlert, Zap, Award, ArrowUpRight } from 'lucide-react';
+import { useCms } from '../context/CmsContext';
 
 export default function DifferentiationMatrix({ openDiscoveryModal }) {
-  const comparisonData = [
+  const { content } = useCms();
+  const matrixList = (content?.differentiation && content.differentiation.length > 0)
+    ? content.differentiation.map(d => ({
+        feature: d.criterion || d.feature,
+        s2f: d.s2f,
+        marketplace: d.outsourcing || d.marketplace,
+        staffing: d.freelance || d.staffing
+      }))
+    : [
     {
       feature: "Vetting & Quality Control",
       s2f: "Top 3% Multi-Stage Code & Arch Audit",
@@ -40,6 +49,7 @@ export default function DifferentiationMatrix({ openDiscoveryModal }) {
       staffing: "Varies by local placement"
     }
   ];
+
 
   return (
     <section className="py-14 sm:py-20 px-4 sm:px-6 lg:px-8 bg-sage-banner border-b border-[#b8c8e0] w-full max-w-full overflow-hidden">
@@ -82,8 +92,9 @@ export default function DifferentiationMatrix({ openDiscoveryModal }) {
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-200 text-xs sm:text-sm text-slate-800">
-              {comparisonData.map((row, idx) => (
+              {matrixList.map((row, idx) => (
                 <tr key={idx} className="hover:bg-[#e0e8f4]/60 transition-colors">
+
                   <td className="p-5 font-bold text-[#0f1d31]">
                     {row.feature}
                   </td>

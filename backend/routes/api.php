@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Api\AuthController;
+use App\Http\Controllers\Api\CmsController;
 use App\Http\Controllers\Api\ConsultationController;
 use App\Http\Controllers\Api\InquiryController;
 use App\Http\Controllers\Api\SubscriberController;
@@ -34,6 +35,10 @@ Route::prefix('v1')->group(function () {
     Route::post('/consultations', [ConsultationController::class, 'store']);
     Route::post('/subscribe', [SubscriberController::class, 'subscribe']);
 
+    // ─── Public CMS Content Endpoints ───
+    Route::get('/content', [CmsController::class, 'index']);
+    Route::get('/content/{key}', [CmsController::class, 'show']);
+
     // ─── Authentication ───
     Route::post('/auth/login', [AuthController::class, 'login']);
 
@@ -54,6 +59,11 @@ Route::prefix('v1')->group(function () {
 
             // Subscribers
             Route::get('/subscribers', [SubscriberController::class, 'index']);
+
+            // CMS Content Management
+            Route::post('/content', [CmsController::class, 'bulkUpdate']);
+            Route::post('/content/{key}', [CmsController::class, 'update']);
         });
     });
 });
+

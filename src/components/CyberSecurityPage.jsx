@@ -26,10 +26,15 @@ import {
   HelpCircle,
   ChevronDown
 } from 'lucide-react';
+import { useCms } from '../context/CmsContext';
 
 export default function CyberSecurityPage({ openDiscoveryModal, setActiveTab }) {
+  const { content } = useCms();
+  const security = content?.cybersecurity || {};
+
   // ─── State 1: Active Pillar / Service Tab ───
   const [activePillarTab, setActivePillarTab] = useState('all');
+
 
   // ─── State 2: Interactive Security Audit Estimator ───
   const [infrastructureType, setInfrastructureType] = useState('web-app');
@@ -329,19 +334,32 @@ export default function CyberSecurityPage({ openDiscoveryModal, setActiveTab }) 
               <ShieldCheck className="w-3.5 h-3.5 text-blue-400" />
               <span>ISO 27001 & SOC 2 Aligned</span>
             </div>
+            {security.hotline && (
+              <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-red-500/10 border border-red-500/30 text-red-300 text-xs font-bold uppercase tracking-wider">
+                <span className="w-2 h-2 rounded-full bg-red-400 animate-ping" />
+                <span>24/7 Hotline: {security.hotline}</span>
+              </div>
+            )}
           </div>
 
           {/* Main Headline & SEO H1 */}
           <div className="text-center lg:text-left space-y-4 max-w-3xl">
             <h1 className="text-4xl sm:text-5xl lg:text-6xl font-extrabold text-white tracking-tight leading-[1.12] font-heading">
-              Enterprise <span className="bg-clip-text text-transparent bg-gradient-to-r from-blue-400 via-cyan-400 to-indigo-300">Cyber Security Defense</span> & Global IT Training.
+              {security.headline ? (
+                security.headline
+              ) : (
+                <>
+                  Enterprise <span className="bg-clip-text text-transparent bg-gradient-to-r from-blue-400 via-cyan-400 to-indigo-300">Cyber Security Defense</span> & Global IT Training.
+                </>
+              )}
             </h1>
             <p className="text-base sm:text-lg text-slate-300 font-medium leading-relaxed">
-              Shield your corporate applications, cloud infrastructure, and M365 environments against zero-day exploits. We provide certified penetration testing, DevSecOps hardening, regulatory compliance, and high-impact corporate IT training for global enterprises.
+              {security.subheadline || 'Shield your corporate applications, cloud infrastructure, and M365 environments against zero-day exploits. We provide certified penetration testing, DevSecOps hardening, regulatory compliance, and high-impact corporate IT training for global enterprises.'}
             </p>
           </div>
 
           {/* Call to Action Buttons */}
+
           <div className="flex flex-col sm:flex-row items-center justify-center lg:justify-start gap-4 pt-2">
             <button
               onClick={openDiscoveryModal}
