@@ -3,7 +3,9 @@
  * Connects the React frontend with the Laravel REST API backend.
  */
 
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000/api/v1';
+const isProduction = typeof window !== 'undefined' && window.location.hostname.includes('sovereign2freshempire.com');
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || (isProduction ? '/api/v1' : 'http://localhost:8000/api/v1');
+
 
 /**
  * Standard HTTP request wrapper with JSON headers & error handling
