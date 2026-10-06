@@ -1,0 +1,64 @@
+# ----------------------------------------------------------------------
+# Sovereign2Fresh Empire - Production LiteSpeed / Apache Routing
+# ----------------------------------------------------------------------
+
+# Set DirectoryIndex to prioritize compiled production app
+DirectoryIndex dist/index.html index.html index.php
+
+<IfModule mod_rewrite.c>
+  RewriteEngine On
+  RewriteBase /
+
+  # 1. Map root request and /index.html directly to compiled production build
+  RewriteRule ^$ dist/index.html [L]
+  RewriteRule ^index\.html$ dist/index.html [L]
+
+  # 2. Map Vite bundled static assets (/assets/...) directly to dist/assets/
+  RewriteRule ^assets/(.*)$ dist/assets/$1 [L,QSA]
+
+  # 3. Map root favicon / icons / manifest to dist/
+  RewriteRule ^(favicon.*|apple-touch-icon.*|android-chrome.*|manifest\.webmanifest)$ dist/$1 [L,QSA]
+
+  # 4. Route backend API calls to Laravel backend if requested
+  RewriteCond %{REQUEST_URI} ^/api/
+  RewriteRule ^api/(.*)$ backend/public/index.php [L,QSA]
+
+  # 5. Exclude backend directory from SPA rewrites
+  RewriteCond %{REQUEST_URI} ^/backend/
+  RewriteRule ^ - [L]
+
+  # 6. SPA fallback: Route all other requests (deep links / routes) to dist/index.html
+  RewriteCond %{REQUEST_FILENAME} !-f
+  RewriteCond %{REQUEST_FILENAME} !-d
+  RewriteCond %{REQUEST_URI} !^/dist/
+  RewriteRule ^.*$ dist/index.html [L]
+</IfModule>
+
+# Correct MIME types for modern ES modules and CSS
+<IfModule mod_mime.c>
+  AddType application/javascript .js .mjs
+  AddType text/css .css
+  AddType image/svg+xml .svg
+  AddType image/webp .webp
+  AddType image/png .png
+  AddType application/manifest+json .webmanifest
+</IfModule>
+
+# Browser Caching Policy
+<IfModule mod_expires.c>
+  ExpiresActive On
+  ExpiresDefault "access plus 1 month"
+  ExpiresByType text/html "access plus 0 seconds"
+  ExpiresByType text/css "access plus 1 year"
+  ExpiresByType application/javascript "access plus 1 year"
+  ExpiresByType image/png "access plus 1 year"
+  ExpiresByType image/jpeg "access plus 1 year"
+  ExpiresByType image/svg+xml "access plus 1 year"
+  ExpiresByType image/x-icon "access plus 1 year"
+</IfModule>
+
+# Security: prevent access to source configuration & sensitive files
+<FilesMatch "^(package\.json|package-lock\.json|vite\.config\.js|\.env.*|composer\.json|composer\.lock|BluePrint\.md)$">
+  Order allow,deny
+  Deny from all
+</FilesMatch>
