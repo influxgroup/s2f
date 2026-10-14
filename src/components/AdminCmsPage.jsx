@@ -358,6 +358,7 @@ export default function AdminCmsPage({ onExitAdmin }) {
             <SecurityEditor
               security={content.cybersecurity || {}}
               onSave={(updated) => updateSection('cybersecurity', updated)}
+              adminToken={adminToken}
             />
           )}
 
@@ -1355,139 +1356,729 @@ function ServiceForm({ data, onSave, onCancel, adminToken }) {
   );
 }
 
-/* ─── 3. CYBER SECURITY EDITOR ─── */
-function SecurityEditor({ security = {}, onSave }) {
+/* ─── 3. CYBER SECURITY EDITOR (FULL SUITE) ─── */
+function SecurityEditor({ security = {}, onSave, adminToken }) {
   const [formData, setFormData] = useState(security);
+  const [activeTab, setActiveTab] = useState('hero'); // hero | sectors | capabilities | protocol | faqs
+  const [activeSectorKey, setActiveSectorKey] = useState('business'); // business | government | private
+  const [editingServiceIndex, setEditingServiceIndex] = useState(null);
   const [saved, setSaved] = useState(false);
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    onSave(formData);
+  useEffect(() => {
+    setFormData(security);
+  }, [security]);
+
+  const handleSaveAll = (updated = formData) => {
+    onSave(updated);
     setSaved(true);
     setTimeout(() => setSaved(false), 2500);
   };
 
-  const handlePackageChange = (index, field, value) => {
-    const nextPackages = [...(formData.packages || [])];
-    nextPackages[index] = { ...nextPackages[index], [field]: value };
-    setFormData({ ...formData, packages: nextPackages });
+  // Helper to update top-level fields
+  const updateField = (field, value) => {
+    const next = { ...formData, [field]: value };
+    setFormData(next);
+    onSave(next);
+  };
+
+  // ── Metrics Bar ──
+  const handleMetricChange = (index, field, value) => {
+    const nextMetrics = [...(formData.metrics || [])];
+    nextMetrics[index] = { ...nextMetrics[index], [field]: value };
+    const next = { ...formData, metrics: nextMetrics };
+    setFormData(next);
+    onSave(next);
+  };
+
+  // ── Sector Solutions ──
+  const currentSector = formData.sectorSolutions?.[activeSectorKey] || {};
+  const updateCurrentSector = (field, value) => {
+    const nextSectors = {
+      ...(formData.sectorSolutions || {}),
+      [activeSectorKey]: {
+        ...currentSector,
+        [field]: value
+      }
+    };
+    const next = { ...formData, sectorSolutions: nextSectors };
+    setFormData(next);
+    onSave(next);
+  };
+
+  const handleSectorStakeChange = (sIdx, value) => {
+    const nextStakes = [...(currentSector.stakes || [])];
+    nextStakes[sIdx] = value;
+    updateCurrentSector('stakes', nextStakes);
+  };
+
+  const handleAddSectorStake = () => {
+    const nextStakes = [...(currentSector.stakes || []), 'New threat risk or regulatory penalty'];
+    updateCurrentSector('stakes', nextStakes);
+  };
+
+  const handleRemoveSectorStake = (sIdx) => {
+    const nextStakes = (currentSector.stakes || []).filter((_, i) => i !== sIdx);
+    updateCurrentSector('stakes', nextStakes);
+  };
+
+  const handleSectorSolutionChange = (solIdx, field, value) => {
+    const nextSolutions = [...(currentSector.solutions || [])];
+    nextSolutions[solIdx] = { ...nextSolutions[solIdx], [field]: value };
+    updateCurrentSector('solutions', nextSolutions);
+  };
+
+  const handleAddSectorSolution = () => {
+    const nextSolutions = [
+      ...(currentSector.solutions || []),
+      { title: 'New Sector Security Offering', desc: 'Detailed description of how this architecture protects the sector.' }
+    ];
+    updateCurrentSector('solutions', nextSolutions);
+  };
+
+  const handleRemoveSectorSolution = (solIdx) => {
+    const nextSolutions = (currentSector.solutions || []).filter((_, i) => i !== solIdx);
+    updateCurrentSector('solutions', nextSolutions);
+  };
+
+  // ── Services / Capabilities ──
+  const servicesList = formData.servicesList || [];
+  const handleServiceChange = (idx, field, value) => {
+    const nextServices = [...servicesList];
+    nextServices[idx] = { ...nextServices[idx], [field]: value };
+    const next = { ...formData, servicesList: nextServices };
+    setFormData(next);
+    onSave(next);
+  };
+
+  const handleAddDeliverable = (sIdx) => {
+    const nextServices = [...servicesList];
+    const target = nextServices[sIdx];
+    const nextDeliverables = [...(target.deliverables || []), 'New Security Deliverable / Report Patch'];
+    nextServices[sIdx] = { ...target, deliverables: nextDeliverables };
+    const next = { ...formData, servicesList: nextServices };
+    setFormData(next);
+    onSave(next);
+  };
+
+  const handleDeliverableChange = (sIdx, dIdx, value) => {
+    const nextServices = [...servicesList];
+    const target = nextServices[sIdx];
+    const nextDeliverables = [...(target.deliverables || [])];
+    nextDeliverables[dIdx] = value;
+    nextServices[sIdx] = { ...target, deliverables: nextDeliverables };
+    const next = { ...formData, servicesList: nextServices };
+    setFormData(next);
+    onSave(next);
+  };
+
+  const handleRemoveDeliverable = (sIdx, dIdx) => {
+    const nextServices = [...servicesList];
+    const target = nextServices[sIdx];
+    const nextDeliverables = (target.deliverables || []).filter((_, i) => i !== dIdx);
+    nextServices[sIdx] = { ...target, deliverables: nextDeliverables };
+    const next = { ...formData, servicesList: nextServices };
+    setFormData(next);
+    onSave(next);
+  };
+
+  // ── 4-Stage Audit Protocol ──
+  const auditPhases = formData.auditPhases || [];
+  const handlePhaseChange = (idx, field, value) => {
+    const nextPhases = [...auditPhases];
+    nextPhases[idx] = { ...nextPhases[idx], [field]: value };
+    const next = { ...formData, auditPhases: nextPhases };
+    setFormData(next);
+    onSave(next);
+  };
+
+  // ── FAQs ──
+  const faqs = formData.faqs || [];
+  const handleFaqChange = (idx, field, value) => {
+    const nextFaqs = [...faqs];
+    nextFaqs[idx] = { ...nextFaqs[idx], [field]: value };
+    const next = { ...formData, faqs: nextFaqs };
+    setFormData(next);
+    onSave(next);
+  };
+
+  const handleAddFaq = () => {
+    const nextFaqs = [
+      ...faqs,
+      { q: 'New Security Testing Question?', a: 'Detailed executive answer outlining methodology and guarantees.' }
+    ];
+    const next = { ...formData, faqs: nextFaqs };
+    setFormData(next);
+    onSave(next);
+  };
+
+  const handleRemoveFaq = (idx) => {
+    if (window.confirm('Delete this FAQ entry?')) {
+      const nextFaqs = faqs.filter((_, i) => i !== idx);
+      const next = { ...formData, faqs: nextFaqs };
+      setFormData(next);
+      onSave(next);
+    }
   };
 
   return (
     <div className="space-y-6">
-      <div className="border-b border-slate-200/80 pb-4 flex items-center justify-between">
+      
+      {/* Studio Section Header */}
+      <div className="border-b border-slate-200/80 pb-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
         <div>
           <h2 className="text-xl font-bold text-slate-900 tracking-tight">Cyber Security & Audits Management</h2>
-          <p className="text-xs text-slate-500 mt-1">Configure threat hotline, response SLAs, and security packages.</p>
+          <p className="text-xs text-slate-500 mt-0.5">
+            Manage live copy, emergency hotline, sector architectures, capabilities, audit protocol, and FAQs.
+          </p>
         </div>
-        {saved && (
-          <span className="text-xs text-emerald-700 bg-emerald-50 border border-emerald-200 px-2.5 py-1 rounded-full flex items-center gap-1 font-medium">
-            <Check className="w-3.5 h-3.5" /> Saved
-          </span>
-        )}
+        <div className="flex items-center gap-2">
+          {saved && (
+            <span className="text-xs text-emerald-700 bg-emerald-50 border border-emerald-200 px-2.5 py-1 rounded-full flex items-center gap-1 font-medium">
+              <Check className="w-3.5 h-3.5" /> Saved to CMS
+            </span>
+          )}
+          <button
+            onClick={() => handleSaveAll()}
+            className="px-3.5 py-1.5 rounded-lg bg-slate-900 hover:bg-slate-800 text-white font-medium text-xs flex items-center gap-1.5 transition-colors cursor-pointer shadow-xs"
+          >
+            <Save className="w-3.5 h-3.5" />
+            <span>Save Security Changes</span>
+          </button>
+        </div>
       </div>
 
-      <form onSubmit={handleSubmit} className="space-y-6">
-        <div className="bg-white border border-slate-200/80 rounded-xl p-6 shadow-xs space-y-4">
-          <h3 className="text-sm font-semibold text-slate-900 pb-2 border-b border-slate-100">Incident Triage & Hotline</h3>
+      {/* Modern Sub-Navigation Tabs */}
+      <div className="flex items-center gap-1 border-b border-slate-200/80 overflow-x-auto pb-1 scrollbar-none">
+        {[
+          { id: 'hero', label: 'Hero & Hotline' },
+          { id: 'sectors', label: 'Sector Solutions (3)' },
+          { id: 'capabilities', label: 'Capabilities List (6)' },
+          { id: 'protocol', label: '4-Stage Protocol' },
+          { id: 'faqs', label: `Security FAQs (${faqs.length})` },
+        ].map((tab) => (
+          <button
+            key={tab.id}
+            type="button"
+            onClick={() => setActiveTab(tab.id)}
+            className={`px-3 py-2 text-xs font-semibold rounded-lg transition-colors cursor-pointer whitespace-nowrap ${
+              activeTab === tab.id
+                ? 'bg-slate-900 text-white shadow-xs'
+                : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100'
+            }`}
+          >
+            {tab.label}
+          </button>
+        ))}
+      </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+      {/* ──────────────────────────────────────────────────────────
+          SUB-TAB 1: HERO, HOTLINE & METRICS
+      ────────────────────────────────────────────────────────── */}
+      {activeTab === 'hero' && (
+        <div className="space-y-6">
+          <div className="bg-white border border-slate-200/80 rounded-xl p-6 shadow-xs space-y-4">
+            <h3 className="text-sm font-semibold text-slate-900 pb-2 border-b border-slate-100">Hero Header & Emergency Hotline</h3>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div className="space-y-1.5">
+                <label className="text-xs font-semibold text-slate-700">Top Status Pill / Badge</label>
+                <input
+                  type="text"
+                  value={formData.heroBadge || ''}
+                  onChange={(e) => updateField('heroBadge', e.target.value)}
+                  className="w-full px-3.5 py-2.5 rounded-lg bg-white border border-slate-300 text-slate-900 text-xs focus:ring-2 focus:ring-blue-600/20 focus:border-blue-600 shadow-2xs"
+                  placeholder="e.g. Sovereign Threat Intelligence & Penetration Testing"
+                />
+              </div>
+
+              <div className="space-y-1.5">
+                <label className="text-xs font-semibold text-slate-700">Emergency Phone Hotline (24/7)</label>
+                <input
+                  type="text"
+                  value={formData.hotline || ''}
+                  onChange={(e) => updateField('hotline', e.target.value)}
+                  className="w-full px-3.5 py-2.5 rounded-lg bg-white border border-slate-300 text-slate-900 text-xs focus:ring-2 focus:ring-blue-600/20 focus:border-blue-600 shadow-2xs"
+                  placeholder="+234 (0) 800-723-3674"
+                />
+                <p className="text-[11px] text-slate-400">Displays on the Cybersecurity Hero banner and emergency call link.</p>
+              </div>
+            </div>
+
             <div className="space-y-1.5">
-              <label className="text-xs font-semibold text-slate-700">Emergency Phone Hotline</label>
+              <label className="text-xs font-semibold text-slate-700">Main Headline</label>
               <input
                 type="text"
-                value={formData.hotline || ''}
-                onChange={(e) => setFormData({ ...formData, hotline: e.target.value })}
-                className="w-full px-3.5 py-2.5 rounded-lg bg-white border border-slate-300 text-slate-900 text-xs focus:ring-2 focus:ring-blue-600/20 focus:border-blue-600 shadow-2xs"
+                value={formData.headline || ''}
+                onChange={(e) => updateField('headline', e.target.value)}
+                className="w-full px-3.5 py-2.5 rounded-lg bg-white border border-slate-300 text-slate-900 text-xs focus:ring-2 focus:ring-blue-600/20 focus:border-blue-600 shadow-2xs font-bold"
               />
             </div>
+
             <div className="space-y-1.5">
-              <label className="text-xs font-semibold text-slate-700">SLA Response Guarantee</label>
-              <input
-                type="text"
-                value={formData.slaResponse || ''}
-                onChange={(e) => setFormData({ ...formData, slaResponse: e.target.value })}
-                className="w-full px-3.5 py-2.5 rounded-lg bg-white border border-slate-300 text-slate-900 text-xs focus:ring-2 focus:ring-blue-600/20 focus:border-blue-600 shadow-2xs"
+              <label className="text-xs font-semibold text-slate-700">Subheadline Paragraph</label>
+              <textarea
+                rows={3}
+                value={formData.subheadline || ''}
+                onChange={(e) => updateField('subheadline', e.target.value)}
+                className="w-full px-3.5 py-2.5 rounded-lg bg-white border border-slate-300 text-slate-900 text-xs focus:ring-2 focus:ring-blue-600/20 focus:border-blue-600 shadow-2xs leading-relaxed"
               />
             </div>
           </div>
 
-          <div className="space-y-1.5">
-            <label className="text-xs font-semibold text-slate-700">Page Headline</label>
-            <input
-              type="text"
-              value={formData.headline || ''}
-              onChange={(e) => setFormData({ ...formData, headline: e.target.value })}
-              className="w-full px-3.5 py-2.5 rounded-lg bg-white border border-slate-300 text-slate-900 text-xs focus:ring-2 focus:ring-blue-600/20 focus:border-blue-600 shadow-2xs"
-            />
-          </div>
+          {/* 4 Trust Metrics Bar */}
+          <div className="bg-white border border-slate-200/80 rounded-xl p-6 shadow-xs space-y-4">
+            <h3 className="text-sm font-semibold text-slate-900 pb-2 border-b border-slate-100">Hero Trust Metrics Bar (4 Cards)</h3>
 
-          <div className="space-y-1.5">
-            <label className="text-xs font-semibold text-slate-700">Page Subheadline</label>
-            <textarea
-              rows={2}
-              value={formData.subheadline || ''}
-              onChange={(e) => setFormData({ ...formData, subheadline: e.target.value })}
-              className="w-full px-3.5 py-2.5 rounded-lg bg-white border border-slate-300 text-slate-900 text-xs focus:ring-2 focus:ring-blue-600/20 focus:border-blue-600 shadow-2xs"
-            />
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+              {(formData.metrics || []).map((m, mIdx) => (
+                <div key={mIdx} className="p-3.5 rounded-lg border border-slate-200 bg-slate-50 space-y-2">
+                  <div className="space-y-1">
+                    <label className="text-[10px] font-semibold text-slate-500 uppercase">Metric {mIdx + 1} Value</label>
+                    <input
+                      type="text"
+                      value={m.value || ''}
+                      onChange={(e) => handleMetricChange(mIdx, 'value', e.target.value)}
+                      className="w-full px-2.5 py-1.5 rounded-md bg-white border border-slate-300 text-slate-900 font-mono font-bold text-xs"
+                      placeholder="e.g. < 15 Mins"
+                    />
+                  </div>
+                  <div className="space-y-1">
+                    <label className="text-[10px] font-semibold text-slate-500 uppercase">Label</label>
+                    <input
+                      type="text"
+                      value={m.label || ''}
+                      onChange={(e) => handleMetricChange(mIdx, 'label', e.target.value)}
+                      className="w-full px-2.5 py-1.5 rounded-md bg-white border border-slate-300 text-slate-800 text-xs"
+                      placeholder="e.g. Incident Response SLA"
+                    />
+                  </div>
+                </div>
+              ))}
+            </div>
           </div>
         </div>
+      )}
 
-        {/* 3 Security Packages */}
-        <div className="space-y-3">
-          <h3 className="text-sm font-semibold text-slate-900">Audit & Retainer Packages</h3>
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
-            {(formData.packages || []).map((pkg, idx) => (
-              <div key={pkg.id || idx} className="bg-white border border-slate-200/80 rounded-xl p-5 space-y-3 shadow-xs">
-                <div className="space-y-2">
-                  <input
-                    type="text"
-                    value={pkg.name || ''}
-                    onChange={(e) => handlePackageChange(idx, 'name', e.target.value)}
-                    className="w-full font-bold text-slate-900 text-sm px-2.5 py-1.5 rounded-lg border border-slate-200 focus:border-blue-600"
-                    placeholder="Package Name"
-                  />
-                  <input
-                    type="text"
-                    value={pkg.price || ''}
-                    onChange={(e) => handlePackageChange(idx, 'price', e.target.value)}
-                    className="w-full text-blue-600 font-mono text-base px-2.5 py-1.5 rounded-lg border border-slate-200 font-bold focus:border-blue-600"
-                    placeholder="Price (e.g. $2,850)"
-                  />
+      {/* ──────────────────────────────────────────────────────────
+          SUB-TAB 2: SECTOR SOLUTIONS (BUSINESS, GOVERNMENT, PRIVATE)
+      ────────────────────────────────────────────────────────── */}
+      {activeTab === 'sectors' && (
+        <div className="space-y-6">
+          {/* Sector Selector Tabs */}
+          <div className="flex items-center gap-2 p-1.5 rounded-xl bg-slate-100 border border-slate-200/80 w-fit">
+            {[
+              { key: 'business', label: 'Commercial & Fintechs' },
+              { key: 'government', label: 'Government & Defense' },
+              { key: 'private', label: 'Private Firms & Legal' },
+            ].map((s) => (
+              <button
+                key={s.key}
+                type="button"
+                onClick={() => setActiveSectorKey(s.key)}
+                className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all cursor-pointer ${
+                  activeSectorKey === s.key
+                    ? 'bg-white text-slate-900 shadow-xs'
+                    : 'text-slate-600 hover:text-slate-900'
+                }`}
+              >
+                {s.label}
+              </button>
+            ))}
+          </div>
+
+          <div className="bg-white border border-slate-200/80 rounded-xl p-6 shadow-xs space-y-5">
+            <div className="space-y-1">
+              <span className="text-[10px] font-bold uppercase tracking-wider text-blue-600">Active Sector Configuration</span>
+              <h3 className="text-base font-bold text-slate-900">
+                {activeSectorKey === 'business' ? 'Commercial Enterprises, Fintechs & Digital Platforms' : activeSectorKey === 'government' ? 'Government Ministries, Departments & Agencies (MDAs)' : 'Private Firms, Legal Practices & Executive Leadership'}
+              </h3>
+            </div>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div className="space-y-1.5">
+                <label className="text-xs font-semibold text-slate-700">Sector Title</label>
+                <input
+                  type="text"
+                  value={currentSector.title || ''}
+                  onChange={(e) => updateCurrentSector('title', e.target.value)}
+                  className="w-full px-3.5 py-2 rounded-lg bg-white border border-slate-300 text-slate-900 text-xs focus:ring-2 focus:ring-blue-600/20 focus:border-blue-600"
+                />
+              </div>
+
+              <div className="space-y-1.5">
+                <label className="text-xs font-semibold text-slate-700">Sector Subtitle / Goal</label>
+                <input
+                  type="text"
+                  value={currentSector.subtitle || ''}
+                  onChange={(e) => updateCurrentSector('subtitle', e.target.value)}
+                  className="w-full px-3.5 py-2 rounded-lg bg-white border border-slate-300 text-slate-900 text-xs focus:ring-2 focus:ring-blue-600/20 focus:border-blue-600"
+                />
+              </div>
+            </div>
+
+            <div className="space-y-1.5">
+              <label className="text-xs font-semibold text-slate-700">Threat Context & Industry Context</label>
+              <textarea
+                rows={3}
+                value={currentSector.threatContext || ''}
+                onChange={(e) => updateCurrentSector('threatContext', e.target.value)}
+                className="w-full px-3.5 py-2 rounded-lg bg-white border border-slate-300 text-slate-900 text-xs focus:ring-2 focus:ring-blue-600/20 focus:border-blue-600 leading-relaxed"
+              />
+            </div>
+
+            <ImageUploadField
+              label="Sector Showcase Cover Image"
+              value={currentSector.image || ''}
+              onChange={(url) => updateCurrentSector('image', url)}
+              adminToken={adminToken}
+              folder="security"
+            />
+
+            {/* Critical Risks We Eliminate */}
+            <div className="space-y-3 pt-3 border-t border-slate-100">
+              <div className="flex items-center justify-between">
+                <div>
+                  <h4 className="text-xs font-bold text-slate-900 uppercase tracking-wider">Critical Business Risks We Eliminate</h4>
+                  <p className="text-[11px] text-slate-400">Bullet points displayed in the red risk callout box.</p>
+                </div>
+                <button
+                  type="button"
+                  onClick={handleAddSectorStake}
+                  className="px-2.5 py-1 rounded-md bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-medium flex items-center gap-1 cursor-pointer transition-colors"
+                >
+                  <Plus className="w-3 h-3" /> Add Risk
+                </button>
+              </div>
+
+              <div className="space-y-2">
+                {(currentSector.stakes || []).map((stake, sIdx) => (
+                  <div key={sIdx} className="flex items-center gap-2">
+                    <input
+                      type="text"
+                      value={stake}
+                      onChange={(e) => handleSectorStakeChange(sIdx, e.target.value)}
+                      className="flex-1 px-3 py-1.5 rounded-lg border border-slate-300 text-slate-900 text-xs focus:border-blue-600"
+                    />
+                    <button
+                      type="button"
+                      onClick={() => handleRemoveSectorStake(sIdx)}
+                      className="p-1.5 text-slate-400 hover:text-red-600 transition-colors cursor-pointer"
+                      title="Remove risk bullet"
+                    >
+                      <Trash2 className="w-3.5 h-3.5" />
+                    </button>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* Tailored Solutions List */}
+            <div className="space-y-3 pt-3 border-t border-slate-100">
+              <div className="flex items-center justify-between">
+                <div>
+                  <h4 className="text-xs font-bold text-slate-900 uppercase tracking-wider">Sector Specific Security Solutions</h4>
+                  <p className="text-[11px] text-slate-400">Offerings shown in the 3 cards below the sector overview.</p>
+                </div>
+                <button
+                  type="button"
+                  onClick={handleAddSectorSolution}
+                  className="px-2.5 py-1 rounded-md bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-medium flex items-center gap-1 cursor-pointer transition-colors"
+                >
+                  <Plus className="w-3 h-3" /> Add Solution
+                </button>
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                {(currentSector.solutions || []).map((sol, solIdx) => (
+                  <div key={solIdx} className="p-3.5 rounded-xl border border-slate-200 bg-slate-50 space-y-2 relative group">
+                    <button
+                      type="button"
+                      onClick={() => handleRemoveSectorSolution(solIdx)}
+                      className="absolute top-2 right-2 text-slate-400 hover:text-red-600 p-1 transition-colors cursor-pointer"
+                      title="Remove solution"
+                    >
+                      <Trash2 className="w-3.5 h-3.5" />
+                    </button>
+                    <div className="space-y-1">
+                      <label className="text-[10px] font-semibold text-slate-500 uppercase">Title</label>
+                      <input
+                        type="text"
+                        value={sol.title || ''}
+                        onChange={(e) => handleSectorSolutionChange(solIdx, 'title', e.target.value)}
+                        className="w-full px-2.5 py-1.5 rounded-md bg-white border border-slate-300 text-slate-900 text-xs font-bold"
+                      />
+                    </div>
+                    <div className="space-y-1">
+                      <label className="text-[10px] font-semibold text-slate-500 uppercase">Description</label>
+                      <textarea
+                        rows={3}
+                        value={sol.desc || ''}
+                        onChange={(e) => handleSectorSolutionChange(solIdx, 'desc', e.target.value)}
+                        className="w-full px-2.5 py-1.5 rounded-md bg-white border border-slate-300 text-slate-800 text-xs leading-relaxed"
+                      />
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+          </div>
+        </div>
+      )}
+
+      {/* ──────────────────────────────────────────────────────────
+          SUB-TAB 3: CORE CAPABILITIES (6 SERVICES)
+      ────────────────────────────────────────────────────────── */}
+      {activeTab === 'capabilities' && (
+        <div className="space-y-4">
+          <div className="flex items-center justify-between pb-1">
+            <p className="text-xs text-slate-500">
+              Edit the 6 photo-driven capabilities showcased in the security grid (Penetration testing, Cloud, Identity, Compliance, Incident response, Academy).
+            </p>
+          </div>
+
+          <div className="space-y-4">
+            {servicesList.map((service, idx) => (
+              <div key={service.id || idx} className="bg-white border border-slate-200/80 rounded-xl p-5 space-y-4 shadow-xs">
+                
+                {/* Header row */}
+                <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 pb-3 border-b border-slate-100">
+                  <div className="flex items-center gap-3">
+                    <img
+                      src={service.image}
+                      alt={service.title}
+                      className="w-12 h-12 rounded-lg object-cover border border-slate-200 shrink-0"
+                    />
+                    <div>
+                      <div className="flex items-center gap-2">
+                        <span className="text-[10px] font-bold uppercase px-2 py-0.5 rounded bg-blue-50 text-blue-700 border border-blue-200">
+                          {service.category}
+                        </span>
+                        <h4 className="text-sm font-bold text-slate-900">{service.title}</h4>
+                      </div>
+                      <p className="text-xs text-slate-500 line-clamp-1 mt-0.5">{service.summary}</p>
+                    </div>
+                  </div>
+
+                  <button
+                    type="button"
+                    onClick={() => setEditingServiceIndex(editingServiceIndex === idx ? null : idx)}
+                    className="px-3 py-1.5 rounded-lg border border-slate-200 hover:bg-slate-50 text-slate-700 text-xs font-medium cursor-pointer transition-colors"
+                  >
+                    {editingServiceIndex === idx ? 'Collapse' : 'Edit Service'}
+                  </button>
                 </div>
 
-                <div className="space-y-1">
-                  <label className="text-[11px] font-semibold text-slate-600">Cadence / Turnaround</label>
-                  <input
-                    type="text"
-                    value={pkg.turnaround || ''}
-                    onChange={(e) => handlePackageChange(idx, 'turnaround', e.target.value)}
-                    className="w-full text-xs px-2.5 py-1.5 rounded-lg border border-slate-200 text-slate-800"
-                  />
-                </div>
+                {/* Edit Form if expanded */}
+                {editingServiceIndex === idx && (
+                  <div className="space-y-4 pt-2">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                      <div className="space-y-1">
+                        <label className="text-[11px] font-semibold text-slate-700">Capability Title</label>
+                        <input
+                          type="text"
+                          value={service.title || ''}
+                          onChange={(e) => handleServiceChange(idx, 'title', e.target.value)}
+                          className="w-full px-3 py-1.5 rounded-lg border border-slate-300 text-slate-900 text-xs focus:border-blue-600 font-semibold"
+                        />
+                      </div>
 
-                <div className="space-y-1">
-                  <label className="text-[11px] font-semibold text-slate-600">Tagline</label>
-                  <textarea
-                    rows={2}
-                    value={pkg.tagline || ''}
-                    onChange={(e) => handlePackageChange(idx, 'tagline', e.target.value)}
-                    className="w-full text-xs px-2.5 py-1.5 rounded-lg border border-slate-200 text-slate-800"
-                  />
+                      <div className="space-y-1">
+                        <label className="text-[11px] font-semibold text-slate-700">Filter Category</label>
+                        <select
+                          value={service.category || 'offensive'}
+                          onChange={(e) => handleServiceChange(idx, 'category', e.target.value)}
+                          className="w-full px-3 py-1.5 rounded-lg border border-slate-300 text-slate-900 text-xs focus:border-blue-600 bg-white"
+                        >
+                          <option value="offensive">Offensive Audits</option>
+                          <option value="cloud">Cloud & Identity</option>
+                          <option value="compliance">Compliance & Training</option>
+                          <option value="incident">Incident Response</option>
+                        </select>
+                      </div>
+                    </div>
+
+                    <div className="space-y-1">
+                      <label className="text-[11px] font-semibold text-slate-700">Capability Summary</label>
+                      <textarea
+                        rows={2}
+                        value={service.summary || ''}
+                        onChange={(e) => handleServiceChange(idx, 'summary', e.target.value)}
+                        className="w-full px-3 py-1.5 rounded-lg border border-slate-300 text-slate-900 text-xs focus:border-blue-600 leading-relaxed"
+                      />
+                    </div>
+
+                    <ImageUploadField
+                      label="Service Header Photo"
+                      value={service.image || ''}
+                      onChange={(url) => handleServiceChange(idx, 'image', url)}
+                      adminToken={adminToken}
+                      folder="security"
+                    />
+
+                    {/* Key Deliverables */}
+                    <div className="space-y-2 pt-2 border-t border-slate-100">
+                      <div className="flex items-center justify-between">
+                        <label className="text-[11px] font-bold text-slate-900 uppercase">Key Deliverables ({service.deliverables?.length || 0})</label>
+                        <button
+                          type="button"
+                          onClick={() => handleAddDeliverable(idx)}
+                          className="text-xs text-blue-600 hover:text-blue-700 font-medium cursor-pointer"
+                        >
+                          + Add Deliverable
+                        </button>
+                      </div>
+
+                      <div className="space-y-1.5">
+                        {(service.deliverables || []).map((del, dIdx) => (
+                          <div key={dIdx} className="flex items-center gap-2">
+                            <input
+                              type="text"
+                              value={del}
+                              onChange={(e) => handleDeliverableChange(idx, dIdx, e.target.value)}
+                              className="flex-1 px-2.5 py-1 rounded-md border border-slate-300 text-slate-800 text-xs"
+                            />
+                            <button
+                              type="button"
+                              onClick={() => handleRemoveDeliverable(idx, dIdx)}
+                              className="text-slate-400 hover:text-red-600 p-1 cursor-pointer"
+                              title="Delete deliverable"
+                            >
+                              <Trash2 className="w-3.5 h-3.5" />
+                            </button>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+
+                  </div>
+                )}
+
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* ──────────────────────────────────────────────────────────
+          SUB-TAB 4: 4-STAGE AUDIT PROTOCOL
+      ────────────────────────────────────────────────────────── */}
+      {activeTab === 'protocol' && (
+        <div className="space-y-4">
+          <div className="bg-white border border-slate-200/80 rounded-xl p-6 shadow-xs space-y-4">
+            <h3 className="text-sm font-semibold text-slate-900 pb-2 border-b border-slate-100">
+              4-Stage Security Audit Workflow
+            </h3>
+            <p className="text-xs text-slate-500">
+              The engagement sequence displayed under "Our 4-Stage Security Audit Protocol".
+            </p>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-2">
+              {auditPhases.map((phase, idx) => (
+                <div key={idx} className="p-4 rounded-xl border border-slate-200 bg-slate-50 space-y-3">
+                  <div className="flex items-center justify-between">
+                    <span className="w-8 h-8 rounded-lg bg-blue-100 text-blue-700 font-mono font-bold text-xs flex items-center justify-center border border-blue-200">
+                      {phase.step}
+                    </span>
+                    <input
+                      type="text"
+                      value={phase.step || `0${idx + 1}`}
+                      onChange={(e) => handlePhaseChange(idx, 'step', e.target.value)}
+                      className="w-16 px-2 py-1 rounded border border-slate-300 text-xs font-mono font-bold text-center"
+                      placeholder="Step"
+                    />
+                  </div>
+
+                  <div className="space-y-1">
+                    <label className="text-[10px] font-semibold text-slate-500 uppercase">Phase Title</label>
+                    <input
+                      type="text"
+                      value={phase.title || ''}
+                      onChange={(e) => handlePhaseChange(idx, 'title', e.target.value)}
+                      className="w-full px-2.5 py-1.5 rounded-lg bg-white border border-slate-300 text-slate-900 text-xs font-bold"
+                    />
+                  </div>
+
+                  <div className="space-y-1">
+                    <label className="text-[10px] font-semibold text-slate-500 uppercase">Phase Description</label>
+                    <textarea
+                      rows={3}
+                      value={phase.desc || ''}
+                      onChange={(e) => handlePhaseChange(idx, 'desc', e.target.value)}
+                      className="w-full px-2.5 py-1.5 rounded-lg bg-white border border-slate-300 text-slate-800 text-xs leading-relaxed"
+                    />
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* ──────────────────────────────────────────────────────────
+          SUB-TAB 5: EXECUTIVE FAQS
+      ────────────────────────────────────────────────────────── */}
+      {activeTab === 'faqs' && (
+        <div className="space-y-4">
+          <div className="flex items-center justify-between">
+            <div>
+              <h3 className="text-sm font-semibold text-slate-900">Security Frequently Asked Questions ({faqs.length})</h3>
+              <p className="text-xs text-slate-500">Displayed in the expandable accordion on the cybersecurity page.</p>
+            </div>
+            <button
+              type="button"
+              onClick={handleAddFaq}
+              className="px-3.5 py-2 rounded-lg bg-slate-900 hover:bg-slate-800 text-white font-medium text-xs flex items-center gap-1.5 cursor-pointer shadow-xs transition-colors"
+            >
+              <Plus className="w-3.5 h-3.5" />
+              <span>Add New FAQ</span>
+            </button>
+          </div>
+
+          <div className="space-y-3">
+            {faqs.map((faq, idx) => (
+              <div key={idx} className="bg-white border border-slate-200/80 rounded-xl p-5 space-y-3 shadow-xs">
+                <div className="flex items-start justify-between gap-3">
+                  <span className="w-6 h-6 rounded-md bg-slate-100 text-slate-700 text-xs font-bold flex items-center justify-center shrink-0 mt-0.5">
+                    {idx + 1}
+                  </span>
+                  <div className="flex-1 space-y-2">
+                    <div className="space-y-1">
+                      <label className="text-[10px] font-semibold text-slate-500 uppercase">Question</label>
+                      <input
+                        type="text"
+                        value={faq.q || ''}
+                        onChange={(e) => handleFaqChange(idx, 'q', e.target.value)}
+                        className="w-full px-3 py-1.5 rounded-lg border border-slate-300 text-slate-900 font-bold text-xs focus:border-blue-600"
+                        placeholder="Security question..."
+                      />
+                    </div>
+                    <div className="space-y-1">
+                      <label className="text-[10px] font-semibold text-slate-500 uppercase">Answer</label>
+                      <textarea
+                        rows={3}
+                        value={faq.a || ''}
+                        onChange={(e) => handleFaqChange(idx, 'a', e.target.value)}
+                        className="w-full px-3 py-1.5 rounded-lg border border-slate-300 text-slate-800 text-xs leading-relaxed focus:border-blue-600"
+                        placeholder="Answer details..."
+                      />
+                    </div>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => handleRemoveFaq(idx)}
+                    className="p-1.5 text-slate-400 hover:text-red-600 cursor-pointer transition-colors"
+                    title="Delete question"
+                  >
+                    <Trash2 className="w-4 h-4" />
+                  </button>
                 </div>
               </div>
             ))}
           </div>
         </div>
+      )}
 
-        <button
-          type="submit"
-          className="px-5 py-2.5 rounded-lg bg-slate-900 hover:bg-slate-800 text-white font-semibold text-xs transition-colors shadow-xs flex items-center gap-2 cursor-pointer"
-        >
-          <Save className="w-3.5 h-3.5" />
-          <span>Save Security Settings</span>
-        </button>
-      </form>
     </div>
   );
 }

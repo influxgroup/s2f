@@ -346,7 +346,7 @@ export default function PortfolioPage({ openDiscoveryModal }) {
     }
   ];
 
-  const rawProjects = (content?.portfolio && content.portfolio.length > 0)
+  const rawProjects = Array.isArray(content?.portfolio)
     ? content.portfolio
     : fallbackCaseStudies;
 

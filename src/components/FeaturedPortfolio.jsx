@@ -53,9 +53,10 @@ export default function FeaturedPortfolio({ setActiveTab, openDiscoveryModal }) 
     }
   ];
 
-  const projects = (content?.portfolio && content.portfolio.length > 0)
-    ? content.portfolio.slice(0, 3)
+  const rawProjects = Array.isArray(content?.portfolio)
+    ? content.portfolio
     : fallbackProjects;
+  const projects = rawProjects.slice(0, 3);
 
   return (
     <section className="py-16 px-4 sm:px-6 lg:px-8 bg-slate-50 border-b border-slate-200">

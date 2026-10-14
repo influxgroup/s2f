@@ -139,7 +139,7 @@ export default function BlogPage({ openDiscoveryModal }) {
     { label: 'May 2026', count: 2 }
   ];
 
-  const rawArticles = (content?.blog && content.blog.length > 0) ? content.blog : fallbackArticles;
+  const rawArticles = Array.isArray(content?.blog) ? content.blog : fallbackArticles;
   const articles = rawArticles.map(art => ({
     ...art,
     image: art.image || art.coverImage || 'https://images.unsplash.com/photo-1522071820081-009f0129c71c?auto=format&fit=crop&w=800&q=80',
@@ -572,8 +572,14 @@ export default function BlogPage({ openDiscoveryModal }) {
             {filteredArticles.length === 0 ? (
               <div className="bg-white p-12 rounded-3xl border border-[#b8c8e0] text-center space-y-3">
                 <BookOpen className="w-8 h-8 text-slate-400 mx-auto" />
-                <h4 className="font-extrabold text-[#0f1d31] text-lg">No articles found</h4>
-                <p className="text-xs text-slate-500">Try clearing your search query or selecting a different category tab.</p>
+                <h4 className="font-extrabold text-[#0f1d31] text-lg">
+                  {rawArticles.length === 0 ? "No Articles Published Yet" : "No articles found"}
+                </h4>
+                <p className="text-xs text-slate-500">
+                  {rawArticles.length === 0
+                    ? "Thought leadership publications and engineering playbooks are currently being updated. Please check back soon."
+                    : "Try clearing your search query or selecting a different category tab."}
+                </p>
               </div>
             ) : (
               <div className="space-y-6">
@@ -714,27 +720,31 @@ export default function BlogPage({ openDiscoveryModal }) {
               </div>
 
               <div className="space-y-3.5">
-                {articles.slice(0, 3).map((trend, tIdx) => (
-                  <div
-                    key={trend.id}
-                    onClick={() => openArticleModal(trend)}
-                    className="flex items-start gap-3 group cursor-pointer"
-                  >
-                    <span className="w-6 h-6 rounded-lg bg-blue-50 text-[#2563eb] font-extrabold text-xs flex items-center justify-center shrink-0 border border-blue-200">
-                      #{tIdx + 1}
-                    </span>
-                    <div className="space-y-1">
-                      <h4 className="font-extrabold text-xs text-[#0f1d31] group-hover:text-[#2563eb] transition-colors leading-snug line-clamp-2">
-                        {trend.title}
-                      </h4>
-                      <div className="flex items-center gap-2 text-[10px] text-slate-500 font-semibold">
-                        <span>{trend.date}</span>
-                        <span>•</span>
-                        <span className="text-blue-600 font-bold flex items-center gap-0.5"><Eye className="w-3 h-3" /> {articleViews[trend.id]} views</span>
+                {articles.length === 0 ? (
+                  <p className="text-xs text-slate-400 italic">No publications available yet.</p>
+                ) : (
+                  articles.slice(0, 3).map((trend, tIdx) => (
+                    <div
+                      key={trend.id}
+                      onClick={() => openArticleModal(trend)}
+                      className="flex items-start gap-3 group cursor-pointer"
+                    >
+                      <span className="w-6 h-6 rounded-lg bg-blue-50 text-[#2563eb] font-extrabold text-xs flex items-center justify-center shrink-0 border border-blue-200">
+                        #{tIdx + 1}
+                      </span>
+                      <div className="space-y-1">
+                        <h4 className="font-extrabold text-xs text-[#0f1d31] group-hover:text-[#2563eb] transition-colors leading-snug line-clamp-2">
+                          {trend.title}
+                        </h4>
+                        <div className="flex items-center gap-2 text-[10px] text-slate-500 font-semibold">
+                          <span>{trend.date}</span>
+                          <span>•</span>
+                          <span className="text-blue-600 font-bold flex items-center gap-0.5"><Eye className="w-3 h-3" /> {articleViews[trend.id]} views</span>
+                        </div>
                       </div>
                     </div>
-                  </div>
-                ))}
+                  ))
+                )}
               </div>
             </div>
 

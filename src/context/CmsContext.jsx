@@ -130,58 +130,213 @@ export const initialCmsDefaults = {
     }
   ],
   cybersecurity: {
-    headline: 'Enterprise Cybersecurity Audits & Code Hardening',
-    subheadline: 'Rigorous vulnerability assessments, zero-day mitigation, and dual-layer compliance certifications for modern digital infrastructure.',
+    heroBadge: 'Sovereign Threat Intelligence & Penetration Testing',
+    headline: 'Critical Cybersecurity Defense For Businesses, Governments & Private Firms.',
+    subheadline: 'One unpatched exploit can halt your entire organization and destroy client trust. Sovereign2Fresh Empire delivers certified penetration testing, cloud defense, and 24/7 incident response to guarantee operational continuity.',
     hotline: '+234 (0) 800-723-3674',
     hotlineLabel: 'Emergency Threat Hotline (24/7)',
     slaResponse: 'Under 15 Minutes Emergency Response',
-    packages: [
+    metrics: [
+      { value: '< 15 Mins', label: 'Incident Response SLA' },
+      { value: '100%', label: 'NDPR & ISO Pass Rate' },
+      { value: 'Zero Leaks', label: 'Air-Gapped Audits & NDAs' },
+      { value: '$50M+', label: 'Protected Client Assets' }
+    ],
+    sectorSolutions: {
+      business: {
+        title: "Commercial Enterprises, Fintechs & Digital Platforms",
+        subtitle: "Protect Transactional Rails, Customer Financial Data, and Business Continuity.",
+        threatContext: "For fast-growing tech companies and fintechs, a single API flaw or credential compromise can cause multi-million dollar fraud losses, immediate operational shutdown, and catastrophic regulatory fines from central banks and data protection authorities.",
+        image: "https://images.unsplash.com/photo-1551288049-bebda4e38f71?auto=format&fit=crop&w=1000&q=80",
+        stakes: [
+          "Financial data exfiltration and payment gateway tampering",
+          "Ransomware attacks causing weeks of downtime and revenue loss",
+          "PCI-DSS, NDPR, and Central Bank compliance penalties"
+        ],
+        solutions: [
+          {
+            title: "Web & Mobile API Penetration Testing",
+            desc: "Full black-box and grey-box security tests simulating realistic financial cyberattacks against your payment endpoints, authentication logic, and mobile app binaries."
+          },
+          {
+            title: "DevSecOps & Source Code Hardening",
+            desc: "Automated static and dynamic vulnerability scans integrated directly into GitHub/GitLab CI/CD pipelines before any code deploys to production."
+          },
+          {
+            title: "Cloud IAM & Kubernetes Defense",
+            desc: "Securing AWS/Azure environments, secret vaults, database encryption, and preventing accidental S3 or database exposures."
+          }
+        ]
+      },
+      government: {
+        title: "Government Ministries, Departments & Agencies (MDAs)",
+        subtitle: "Defend Sovereign Digital Assets, Citizen Records, and Public Infrastructure.",
+        threatContext: "Public sector portals and state databases face continuous threats from foreign threat actors, cyber-extortion syndicates, and internal leaks. We provide national sovereignty-grade security audits, infrastructure isolation, and regulatory attestation.",
+        image: "https://images.unsplash.com/photo-1541872703-74c5e44368f9?auto=format&fit=crop&w=1000&q=80",
+        stakes: [
+          "Espionage targeting sensitive policy documents and citizen databases",
+          "Ransomware hijacking government revenue or administrative portals",
+          "Public trust collapse and national security vulnerabilities"
+        ],
+        solutions: [
+          {
+            title: "Critical Infrastructure & Network Perimeter Audits",
+            desc: "Hardening national databases, government portals, and internal networks against unauthorized access, zero-day exploits, and DDoS sabotage."
+          },
+          {
+            title: "Sovereign Data Protection & NDPR Compliance",
+            desc: "Ensuring government citizen records adhere strictly to the Nigeria Data Protection Act (NDPA), NDPR mandates, and ISO 27001 data residency standards."
+          },
+          {
+            title: "Air-Gapped Systems & Digital Forensics",
+            desc: "Isolated security evaluations, tamper-proof audit trails, and forensic incident investigations with zero risk of information leakage."
+          }
+        ]
+      },
+      private: {
+        title: "Private Firms, Legal Practices & Executive Leadership",
+        subtitle: "Secure Confidential M&A Transactions, Legal Files, and Board Communications.",
+        threatContext: "Law firms, private equity groups, and corporate boards are prime targets for Business Email Compromise (BEC), spear-phishing, and corporate espionage during high-stakes mergers, litigations, and commercial negotiations.",
+        image: "https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?auto=format&fit=crop&w=1000&q=80",
+        stakes: [
+          "Leaked acquisition targets, contract negotiations, and privileged client files",
+          "CEO / CFO impersonation and fraudulent wire transfer directives",
+          "Reputational destruction and loss of high-net-worth client retainers"
+        ],
+        solutions: [
+          {
+            title: "Microsoft 365, Entra ID & Identity Hardening",
+            desc: "Enforcing zero-trust conditional access, phishing-resistant Multi-Factor Authentication (MFA), and automated Data Loss Prevention (DLP) across SharePoint and email."
+          },
+          {
+            title: "Executive Spear-Phishing Defense & Surveillance",
+            desc: "Dark web executive credential monitoring, executive device encryption, and targeted threat intelligence to neutralize impersonation scams."
+          },
+          {
+            title: "Protected Internal Channels & Secure File Rooms",
+            desc: "Encrypted internal communication channels, watermarked virtual deal rooms, and granular role-based file access controls."
+          }
+        ]
+      }
+    },
+    servicesList: [
       {
-        id: 'starter',
-        name: 'Rapid Code & Infra Audit',
-        tagline: 'Ideal for early-stage SaaS & seed startups heading into client security review.',
-        price: '$2,850',
-        cadence: 'One-time Assessment',
-        turnaround: '4 Business Days',
-        features: [
-          'Full static & dynamic code vulnerability scan (SAST / DAST)',
-          'OWASP Top 10 web/API weakness review',
-          'Cloud IAM & S3 / storage bucket exposure audit',
-          'Executive risk scorecard & developer remediation guide',
-          'Formal Letter of Attestation for your enterprise clients'
+        id: "pentest",
+        category: "offensive",
+        title: "Penetration Testing & Red Teaming",
+        image: "https://images.unsplash.com/photo-1526374965328-7f61d4dc18c5?auto=format&fit=crop&w=600&q=80",
+        summary: "Manual and automated simulated cyberattacks against web platforms, mobile apps, and internal network infrastructure to locate and seal critical vulnerabilities before adversaries strike.",
+        deliverables: [
+          "OWASP Top 10 Web & REST/GraphQL API Vulnerability Exploits",
+          "iOS & Android Binary Security & Reverse Engineering Audits",
+          "Executive Risk Scorecard with Proof-of-Concept Exploit Proof",
+          "Line-by-Line Developer Remediation Code Patches"
         ]
       },
       {
-        id: 'enterprise',
-        name: 'Comprehensive Penetration Testing & Compliance',
-        tagline: 'Deep gray-box penetration test for fintech, healthcare, and enterprise platforms.',
-        price: '$6,500',
-        cadence: 'Complete Engagement',
-        turnaround: '10 Business Days',
-        popular: true,
-        features: [
-          'All Rapid Audit inclusions',
-          'Certified ethical hacker gray-box penetration testing',
-          'Business logic flaw & authentication bypass testing',
-          'Database encryption & secret management validation',
-          'NDPR, GDPR & ISO 27001 readiness review',
-          'Free 30-day re-test verification following remediation'
+        id: "cloud",
+        category: "cloud",
+        title: "Cloud & DevSecOps Infrastructure Hardening",
+        image: "https://images.unsplash.com/photo-1558494949-ef010cbdcc31?auto=format&fit=crop&w=600&q=80",
+        summary: "Comprehensive architecture review of AWS, Azure, Google Cloud, and containerized Kubernetes clusters to eliminate misconfigurations and privileged access loopholes.",
+        deliverables: [
+          "Infrastructure-as-Code (Terraform / Docker) Security Audits",
+          "CI/CD Pipeline Security Integration (Automated SAST & DAST)",
+          "Secrets Vault Configuration & Zero-Trust IAM Policies",
+          "Cloud Storage & Database Misconfiguration Remediation"
         ]
       },
       {
-        id: 'continuous',
-        name: 'DevSecOps & Retained Virtual CISO',
-        tagline: 'Continuous security oversight and real-time defense for fast-shipping engineering teams.',
-        price: '$3,800',
-        cadence: 'Monthly Retainer',
-        turnaround: 'Continuous 24/7 Monitoring',
-        features: [
-          'Automated CI/CD security gating (GitHub Actions / GitLab CI)',
-          'Monthly dependency & container vulnerability patching',
-          'Quarterly adversarial simulation & penetration testing',
-          'Dedicated fractional CISO for enterprise client security calls',
-          'Priority 15-minute emergency incident response hotline'
+        id: "m365",
+        category: "cloud",
+        title: "Microsoft 365 & Enterprise Identity Governance",
+        image: "https://images.unsplash.com/photo-1550751827-4bd374c3f58b?auto=format&fit=crop&w=600&q=80",
+        summary: "Fortifying enterprise Microsoft 365 environments, SharePoint repositories, and Intune device endpoints to prevent Business Email Compromise (BEC) and unauthorized data leakage.",
+        deliverables: [
+          "Entra ID / Azure AD Conditional Access & Phishing-Resistant MFA",
+          "SharePoint & OneDrive Data Loss Prevention (DLP) Policies",
+          "Intune Mobile Device Compliance & Remote Wipe Protocols",
+          "Privileged Access Management (PAM) & Admin Account Audits"
         ]
+      },
+      {
+        id: "compliance",
+        category: "compliance",
+        title: "Regulatory Compliance & Security Audits",
+        image: "https://images.unsplash.com/photo-1450133064473-71024230f91b?auto=format&fit=crop&w=600&q=80",
+        summary: "Guiding organizations through international and national regulatory audits to achieve verified compliance, avoiding crippling fines and passing partner security reviews.",
+        deliverables: [
+          "ISO/IEC 27001:2022 Information Security Management (ISMS)",
+          "SOC 2 Type I & Type II Readiness Gap Assessment",
+          "Nigeria Data Protection Act (NDPA) & NDPR Compliance Sign-Off",
+          "Official Attestation of Security for Enterprise Client Reviews"
+        ]
+      },
+      {
+        id: "incident",
+        category: "incident",
+        title: "24/7 Incident Response & Digital Forensics",
+        image: "https://images.unsplash.com/photo-1563986768609-322da13575f3?auto=format&fit=crop&w=600&q=80",
+        summary: "Rapid incident containment, active ransomware eradication, root cause digital forensic analysis, and business restoration in the event of an active cyber crisis.",
+        deliverables: [
+          "Immediate Compromise & Ransomware Containment",
+          "Digital Forensic Evidence Extraction & Chain-of-Custody Logs",
+          "Adversary Eradication & Post-Incident Architecture Rebuild",
+          "Formal Breach Forensic Report for Regulators & Insurers"
+        ]
+      },
+      {
+        id: "training",
+        category: "compliance",
+        title: "Corporate Cyber Academy & Staff Awareness",
+        image: "https://images.unsplash.com/photo-1531482615713-2afd69097998?auto=format&fit=crop&w=600&q=80",
+        summary: "Transforming your workforce into your strongest security defense through realistic simulated phishing attacks, executive threat briefings, and developer secure coding labs.",
+        deliverables: [
+          "Executive & Boardroom Cyber Threat & Crisis Briefings",
+          "Simulated Email Phishing & Social Engineering Drills",
+          "Secure Coding Workshops for Software Engineering Teams",
+          "Verifiable Corporate Cyber Completion Certification"
+        ]
+      }
+    ],
+    auditPhases: [
+      {
+        step: "01",
+        title: "Confidential Scoping & NDA Execution",
+        desc: "We sign enforceable bilateral non-disclosure agreements before reviewing any system details. Clear engagement boundaries, testing authorization, and zero-downtime rules of engagement are formalized."
+      },
+      {
+        step: "02",
+        title: "Deep-Vector Penetration & Threat Simulation",
+        desc: "Certified ethical hackers simulate real-world threat actors using proprietary exploit tools and manual testing across web endpoints, cloud configurations, databases, and APIs."
+      },
+      {
+        step: "03",
+        title: "Executive Scorecard & Developer Remediation",
+        desc: "You receive an executive briefing highlighting high-risk business exposures alongside an exhaustive technical report containing line-by-line code patches and configuration instructions."
+      },
+      {
+        step: "04",
+        title: "Verification Re-Test & Formal Attestation",
+        desc: "Once your engineering team applies the security fixes, we re-test every flagged vulnerability. Upon successful verification, we issue an official Letter of Security Attestation for your board, clients, and regulators."
+      }
+    ],
+    faqs: [
+      {
+        q: "How do you guarantee that penetration testing will not cause downtime for our live users or transactions?",
+        a: "Our certified security engineers utilize surgical, controlled testing techniques with pre-agreed rules of engagement. For high-volume production platforms, testing can be conducted during low-traffic maintenance windows or against exact staging replicas. We maintain live communication with your DevOps and IT lead throughout the exercise to ensure zero service disruption."
+      },
+      {
+        q: "How is the confidentiality of our source code, customer data, and system credentials protected?",
+        a: "Confidentiality is the bedrock of our business. Before receiving any access, Sovereign2Fresh Empire executes dual-jurisdiction binding Non-Disclosure Agreements. All security audits are conducted from encrypted, air-gapped workstations. We adhere strictly to zero-data-retention: all testing data and temporary credentials are cryptographically destroyed post-audit."
+      },
+      {
+        q: "Do you issue official certificates and attestation letters that we can submit to regulators, insurers, and enterprise clients?",
+        a: "Yes. Following remediation verification, we issue an official Sovereign2Fresh Empire Letter of Attestation and Security Scorecard. This document is widely accepted by enterprise procurement teams, global audit firms, insurance underwriters, and regulatory authorities (such as NDPC, Central Bank, and international compliance bodies) as proof of rigorous security posture."
+      },
+      {
+        q: "What is your emergency response SLA if our organization suspects an active breach or ransomware infection?",
+        a: "For confirmed emergency security incidents, our 24/7 Digital Forensics and Incident Response team initiates containment triage within 15 minutes of contact through our dedicated Emergency Incident Hotline. We isolate compromised nodes, stop lateral ransomware propagation, and preserve forensic artifacts."
       }
     ]
   },
@@ -599,8 +754,37 @@ export function CmsProvider({ children }) {
             return d;
           });
         }
-        if (!parsed.blog || parsed.blog.length < 5) {
+        // Only fallback to default blog if blog is not an array at all (e.g. uninitialized)
+        // If the user intentionally deleted articles resulting in an empty array [], respect the deletion.
+        if (!Array.isArray(parsed.blog)) {
           parsed.blog = initialCmsDefaults.blog;
+        }
+        if (!Array.isArray(parsed.portfolio)) {
+          parsed.portfolio = initialCmsDefaults.portfolio;
+        }
+        if (!parsed.cybersecurity) {
+          parsed.cybersecurity = initialCmsDefaults.cybersecurity;
+        } else {
+          parsed.cybersecurity = {
+            ...initialCmsDefaults.cybersecurity,
+            ...parsed.cybersecurity,
+            sectorSolutions: {
+              ...initialCmsDefaults.cybersecurity.sectorSolutions,
+              ...(parsed.cybersecurity.sectorSolutions || {})
+            },
+            servicesList: Array.isArray(parsed.cybersecurity.servicesList) && parsed.cybersecurity.servicesList.length > 0
+              ? parsed.cybersecurity.servicesList
+              : initialCmsDefaults.cybersecurity.servicesList,
+            auditPhases: Array.isArray(parsed.cybersecurity.auditPhases) && parsed.cybersecurity.auditPhases.length > 0
+              ? parsed.cybersecurity.auditPhases
+              : initialCmsDefaults.cybersecurity.auditPhases,
+            faqs: Array.isArray(parsed.cybersecurity.faqs) && parsed.cybersecurity.faqs.length > 0
+              ? parsed.cybersecurity.faqs
+              : initialCmsDefaults.cybersecurity.faqs,
+            metrics: Array.isArray(parsed.cybersecurity.metrics) && parsed.cybersecurity.metrics.length > 0
+              ? parsed.cybersecurity.metrics
+              : initialCmsDefaults.cybersecurity.metrics,
+          };
         }
         delete parsed.vetting;
         delete parsed.talent;

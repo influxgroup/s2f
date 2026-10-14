@@ -24,6 +24,13 @@ import { useCms } from '../context/CmsContext';
 export default function CyberSecurityPage({ openDiscoveryModal, setActiveTab }) {
   const { content } = useCms();
   const security = content?.cybersecurity || {};
+  const contact = content?.contact || {};
+
+  const headline = security.headline || 'Critical Cybersecurity Defense For Businesses, Governments & Private Firms.';
+  const subheadline = security.subheadline || 'One unpatched exploit can halt your entire organization and destroy client trust. Sovereign2Fresh Empire delivers certified penetration testing, cloud defense, and 24/7 incident response to guarantee operational continuity.';
+  const hotlinePhone = security.hotline || contact.phone || '+234 (0) 800-723-3674';
+  const heroBadge = security.heroBadge || 'Sovereign Threat Intelligence & Penetration Testing';
+  const securityEmail = security.email || contact.email || 'security@sovereign2freshempire.com';
 
   // Active audience tab for targeted solutions: 'business' | 'government' | 'private'
   const [activeAudience, setActiveAudience] = useState('business');
@@ -35,8 +42,19 @@ export default function CyberSecurityPage({ openDiscoveryModal, setActiveTab }) 
   const [openFaq, setOpenFaq] = useState(null);
   const toggleFaq = (idx) => setOpenFaq(openFaq === idx ? null : idx);
 
+  // ─── Default Metrics Bar ───
+  const defaultMetrics = [
+    { value: "< 15 Mins", label: "Incident Response SLA" },
+    { value: "100%", label: "NDPR & ISO Pass Rate" },
+    { value: "Zero Leaks", label: "Air-Gapped Audits & NDAs" },
+    { value: "$50M+", label: "Protected Client Assets" }
+  ];
+  const metrics = (Array.isArray(security.metrics) && security.metrics.length > 0)
+    ? security.metrics
+    : defaultMetrics;
+
   // ─── Target Sectors Data ───
-  const sectorSolutions = {
+  const defaultSectorSolutions = {
     business: {
       title: "Commercial Enterprises, Fintechs & Digital Platforms",
       subtitle: "Protect Transactional Rails, Customer Financial Data, and Business Continuity.",
@@ -114,8 +132,8 @@ export default function CyberSecurityPage({ openDiscoveryModal, setActiveTab }) 
     }
   };
 
-  // ─── Core Security Services ───
-  const servicesList = [
+  // ─── Default Core Security Services ───
+  const defaultServicesList = [
     {
       id: "pentest",
       category: "offensive",
@@ -196,13 +214,8 @@ export default function CyberSecurityPage({ openDiscoveryModal, setActiveTab }) 
     }
   ];
 
-  const filteredServices = servicesList.filter(s => {
-    if (activeServiceCategory === 'all') return true;
-    return s.category === activeServiceCategory;
-  });
-
-  // ─── 4-Step Audit Protocol ───
-  const auditPhases = [
+  // ─── Default 4-Step Audit Protocol ───
+  const defaultAuditPhases = [
     {
       step: "01",
       title: "Confidential Scoping & NDA Execution",
@@ -225,8 +238,8 @@ export default function CyberSecurityPage({ openDiscoveryModal, setActiveTab }) 
     }
   ];
 
-  // ─── Executive FAQs ───
-  const faqs = [
+  // ─── Default Executive FAQs ───
+  const defaultFaqs = [
     {
       q: "How do you guarantee that penetration testing will not cause downtime for our live users or transactions?",
       a: "Our certified security engineers utilize surgical, controlled testing techniques with pre-agreed rules of engagement. For high-volume production platforms, testing can be conducted during low-traffic maintenance windows or against exact staging replicas. We maintain live communication with your DevOps and IT lead throughout the exercise to ensure zero service disruption."
@@ -245,7 +258,24 @@ export default function CyberSecurityPage({ openDiscoveryModal, setActiveTab }) 
     }
   ];
 
-  const currentSector = sectorSolutions[activeAudience];
+  // ─── Active Content Merging ───
+  const sectorSolutions = security.sectorSolutions || defaultSectorSolutions;
+  const servicesList = (Array.isArray(security.servicesList) && security.servicesList.length > 0)
+    ? security.servicesList
+    : defaultServicesList;
+  const auditPhases = (Array.isArray(security.auditPhases) && security.auditPhases.length > 0)
+    ? security.auditPhases
+    : defaultAuditPhases;
+  const faqs = (Array.isArray(security.faqs) && security.faqs.length > 0)
+    ? security.faqs
+    : defaultFaqs;
+
+  const filteredServices = servicesList.filter(s => {
+    if (activeServiceCategory === 'all') return true;
+    return s.category === activeServiceCategory;
+  });
+
+  const currentSector = sectorSolutions[activeAudience] || defaultSectorSolutions[activeAudience] || defaultSectorSolutions.business;
 
   return (
     <div className="bg-white text-slate-900 min-h-screen selection:bg-blue-600 selection:text-white">
@@ -274,15 +304,15 @@ export default function CyberSecurityPage({ openDiscoveryModal, setActiveTab }) 
           <div className="max-w-3xl space-y-3.5 text-center lg:text-left">
             <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-blue-500/15 border border-blue-400/30 text-blue-300 text-xs font-semibold backdrop-blur-md">
               <ShieldAlert className="w-3.5 h-3.5 text-blue-400" />
-              <span>Sovereign Threat Intelligence & Penetration Testing</span>
+              <span>{heroBadge}</span>
             </div>
 
             <h1 className="text-2xl sm:text-3xl lg:text-4xl xl:text-[42px] font-extrabold text-white tracking-tight leading-tight font-heading">
-              Critical Cybersecurity Defense For Businesses, Governments & Private Firms.
+              {headline}
             </h1>
             
             <p className="text-xs sm:text-sm text-slate-200 font-normal leading-relaxed max-w-2xl">
-              One unpatched exploit can halt your entire organization and destroy client trust. Sovereign2Fresh Empire delivers certified penetration testing, cloud defense, and 24/7 incident response to guarantee operational continuity.
+              {subheadline}
             </p>
 
             <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-center lg:justify-start gap-3 pt-1">
@@ -296,36 +326,27 @@ export default function CyberSecurityPage({ openDiscoveryModal, setActiveTab }) 
               </button>
 
               <a
-                href="tel:+2348007233674"
+                href={`tel:${hotlinePhone.replace(/[^0-9+]/g, '')}`}
                 className="px-4 py-2.5 sm:py-3 rounded-xl bg-slate-950/80 hover:bg-slate-900 text-slate-200 font-semibold text-xs sm:text-sm border border-slate-700/80 transition-all flex items-center justify-center gap-2 cursor-pointer backdrop-blur-md"
               >
                 <Phone className="w-4 h-4 text-emerald-400" />
-                <span>Emergency Hotline: +234 (0) 800-723-3674</span>
+                <span>Emergency Hotline: {hotlinePhone}</span>
               </a>
             </div>
           </div>
 
           {/* Compact Trust Metrics Bar */}
           <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 pt-3 border-t border-slate-700/60">
-            <div className="bg-slate-950/70 backdrop-blur-md border border-slate-700/60 p-3 sm:p-3.5 rounded-xl space-y-0.5">
-              <div className="text-lg sm:text-xl font-black text-emerald-400 font-mono">&lt; 15 Mins</div>
-              <p className="text-[11px] text-slate-300 font-medium">Incident Response SLA</p>
-            </div>
-
-            <div className="bg-slate-950/70 backdrop-blur-md border border-slate-700/60 p-3 sm:p-3.5 rounded-xl space-y-0.5">
-              <div className="text-lg sm:text-xl font-black text-blue-400 font-mono">100%</div>
-              <p className="text-[11px] text-slate-300 font-medium">NDPR & ISO Pass Rate</p>
-            </div>
-
-            <div className="bg-slate-950/70 backdrop-blur-md border border-slate-700/60 p-3 sm:p-3.5 rounded-xl space-y-0.5">
-              <div className="text-lg sm:text-xl font-black text-white font-mono">Zero Leaks</div>
-              <p className="text-[11px] text-slate-300 font-medium">Air-Gapped Audits & NDAs</p>
-            </div>
-
-            <div className="bg-slate-950/70 backdrop-blur-md border border-slate-700/60 p-3 sm:p-3.5 rounded-xl space-y-0.5">
-              <div className="text-lg sm:text-xl font-black text-slate-200 font-mono">$50M+</div>
-              <p className="text-[11px] text-slate-300 font-medium">Protected Client Assets</p>
-            </div>
+            {metrics.map((m, idx) => (
+              <div key={idx} className="bg-slate-950/70 backdrop-blur-md border border-slate-700/60 p-3 sm:p-3.5 rounded-xl space-y-0.5">
+                <div className={`text-lg sm:text-xl font-black font-mono ${
+                  idx === 0 ? 'text-emerald-400' : idx === 1 ? 'text-blue-400' : idx === 2 ? 'text-white' : 'text-slate-200'
+                }`}>
+                  {m.value}
+                </div>
+                <p className="text-[11px] text-slate-300 font-medium">{m.label}</p>
+              </div>
+            ))}
           </div>
 
         </div>
@@ -647,7 +668,7 @@ export default function CyberSecurityPage({ openDiscoveryModal, setActiveTab }) 
                 </button>
 
                 <a
-                  href="mailto:security@sovereign2freshempire.com"
+                  href={`mailto:${securityEmail}`}
                   className="w-full py-3.5 px-6 rounded-xl bg-slate-800/80 hover:bg-slate-800 text-slate-200 border border-slate-700 font-semibold text-xs sm:text-sm transition-all flex items-center justify-center gap-2 text-center"
                 >
                   <span>Email Security Desk Directly</span>

@@ -14,8 +14,15 @@ import {
 } from 'lucide-react';
 
 import { submitInquiry } from '../services/api';
+import { useCms } from '../context/CmsContext';
 
 export default function ContactPage({ setActiveTab }) {
+  const { content } = useCms();
+  const contact = content?.contact || {};
+  const phone = contact.phone || '+234 (0) 800-723-3674';
+  const email = contact.email || 'consult@sovereign2freshempire.com';
+  const officeAddress = contact.officeAddress || 'Abuja, Federal Capital Territory, Nigeria';
+
   const [formData, setFormData] = useState({
     companyName: '',
     fullName: '',
@@ -346,12 +353,12 @@ export default function ContactPage({ setActiveTab }) {
                 <div className="space-y-4 text-xs">
                   <div>
                     <div className="text-slate-400 text-[11px]">General Client Inquiries:</div>
-                    <div className="font-extrabold text-white text-sm">consult@sovereign2freshempire.com</div>
+                    <a href={`mailto:${email}`} className="font-extrabold text-white text-sm hover:text-blue-300 transition-colors block">{email}</a>
                   </div>
 
                   <div>
                     <div className="text-slate-400 text-[11px]">Security & Audit Desk:</div>
-                    <div className="font-extrabold text-white text-sm">security@sovereign2freshempire.com</div>
+                    <a href="mailto:security@sovereign2freshempire.com" className="font-extrabold text-white text-sm hover:text-blue-300 transition-colors block">security@sovereign2freshempire.com</a>
                   </div>
 
                   <div className="pt-2 border-t border-slate-700/60 flex items-center justify-between">
@@ -374,8 +381,8 @@ export default function ContactPage({ setActiveTab }) {
                       <MapPin className="w-4 h-4" />
                     </div>
                     <div>
-                      <div className="font-extrabold text-[#0f1d31] text-xs">Abuja, Nigeria</div>
-                      <p className="text-slate-500 text-[11px] mt-0.5">Federal Capital Territory, Nigeria</p>
+                      <div className="font-extrabold text-[#0f1d31] text-xs">Headquarters</div>
+                      <p className="text-slate-500 text-[11px] mt-0.5">{officeAddress}</p>
                     </div>
                   </div>
 
@@ -387,10 +394,10 @@ export default function ContactPage({ setActiveTab }) {
                     <div>
                       <div className="font-extrabold text-[#0f1d31] text-xs">Phone</div>
                       <a 
-                        href="tel:+2348007233674" 
+                        href={`tel:${phone.replace(/[^0-9+]/g, '')}`} 
                         className="text-slate-600 hover:text-blue-600 font-medium text-[11px] mt-0.5 block transition-colors"
                       >
-                        +234 (0) 800-723-3674
+                        {phone}
                       </a>
                     </div>
                   </div>
@@ -403,10 +410,10 @@ export default function ContactPage({ setActiveTab }) {
                     <div>
                       <div className="font-extrabold text-[#0f1d31] text-xs">Email</div>
                       <a 
-                        href="mailto:consult@sovereign2freshempire.com" 
+                        href={`mailto:${email}`} 
                         className="text-slate-600 hover:text-blue-600 font-medium text-[11px] mt-0.5 block transition-colors break-all"
                       >
-                        consult@sovereign2freshempire.com
+                        {email}
                       </a>
                     </div>
                   </div>
