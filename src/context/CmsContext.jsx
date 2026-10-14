@@ -540,6 +540,27 @@ export const initialCmsDefaults = {
     phone: '+234 (0) 800-723-3674',
     officeAddress: 'Abuja, Federal Capital Territory, Nigeria',
     hours: 'Monday - Friday: 08:00 - 18:00 WAT / GMT',
+  },
+  trustTicker: {
+    headline: 'Serving Enterprise Clients In:',
+    legalBadge: '100% Legal & NDA Safeguarded',
+    targetMarkets: [
+      { country: 'Nigeria', flagUrl: 'https://flagcdn.com/w40/ng.png' },
+      { country: 'United States', flagUrl: 'https://flagcdn.com/w40/us.png' },
+      { country: 'United Kingdom', flagUrl: 'https://flagcdn.com/w40/gb.png' },
+      { country: 'Canada', flagUrl: 'https://flagcdn.com/w40/ca.png' },
+      { country: 'European Union', flagUrl: 'https://flagcdn.com/w40/eu.png' },
+    ],
+    techLogos: [
+      { name: 'Flutter & React Native', icon: '📱' },
+      { name: 'PHP & Laravel', icon: '🔴' },
+      { name: 'Python & Django / FastAPI', icon: '🐍' },
+      { name: 'React & Next.js', icon: '⚡' },
+      { name: 'AWS Cloud Infrastructure', icon: '☁️' },
+      { name: 'Kubernetes & Docker', icon: '🐳' },
+      { name: 'Cyber Security & OWASP', icon: '🛡️' },
+      { name: 'PostgreSQL & Redis', icon: '🐘' },
+    ],
   }
 };
 

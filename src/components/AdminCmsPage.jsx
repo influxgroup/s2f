@@ -38,7 +38,8 @@ import {
   ExternalLink,
   Upload,
   Image,
-  Loader2
+  Loader2,
+  Globe
 } from 'lucide-react';
 import s2fLogoHeader from '../assets/s2f_logo_header.png';
 
@@ -194,6 +195,7 @@ export default function AdminCmsPage({ onExitAdmin }) {
   // ─────────────────────────────────────────────────────────────
   const navTabs = [
     { id: 'hero', label: 'Hero & Headlines', icon: Sparkles },
+    { id: 'trustTicker', label: 'Markets & Tech Ribbon', icon: Globe },
     { id: 'services', label: 'Services & Capabilities', icon: Layers, count: content.services?.length },
     { id: 'security', label: 'Cyber Security & Audits', icon: ShieldCheck },
     { id: 'matrix', label: 'Differentiation Matrix', icon: Scale },
@@ -330,6 +332,14 @@ export default function AdminCmsPage({ onExitAdmin }) {
               content={content.hero}
               onSave={(updated) => updateSection('hero', updated)}
               adminToken={adminToken}
+            />
+          )}
+
+          {/* TAB: MARKETS & TECH STACK RIBBON */}
+          {activeSection === 'trustTicker' && (
+            <TrustTickerEditor
+              trustTicker={content.trustTicker || {}}
+              onSave={(updated) => updateSection('trustTicker', updated)}
             />
           )}
 
@@ -687,6 +697,248 @@ function HeroEditor({ content = {}, onSave, adminToken }) {
         >
           <Save className="w-3.5 h-3.5" />
           <span>Save Hero Changes</span>
+        </button>
+      </form>
+    </div>
+  );
+}
+
+/* ─── 1B. MARKETS & TECH STACK RIBBON EDITOR ─── */
+function TrustTickerEditor({ trustTicker = {}, onSave }) {
+  const [formData, setFormData] = useState({
+    headline: trustTicker.headline || 'Serving Enterprise Clients In:',
+    legalBadge: trustTicker.legalBadge || '100% Legal & NDA Safeguarded',
+    targetMarkets: Array.isArray(trustTicker.targetMarkets) && trustTicker.targetMarkets.length > 0
+      ? trustTicker.targetMarkets
+      : [
+          { country: 'Nigeria', flagUrl: 'https://flagcdn.com/w40/ng.png' },
+          { country: 'United States', flagUrl: 'https://flagcdn.com/w40/us.png' },
+          { country: 'United Kingdom', flagUrl: 'https://flagcdn.com/w40/gb.png' },
+          { country: 'Canada', flagUrl: 'https://flagcdn.com/w40/ca.png' },
+          { country: 'European Union', flagUrl: 'https://flagcdn.com/w40/eu.png' },
+        ],
+    techLogos: Array.isArray(trustTicker.techLogos) && trustTicker.techLogos.length > 0
+      ? trustTicker.techLogos
+      : [
+          { name: 'Flutter & React Native', icon: '📱' },
+          { name: 'PHP & Laravel', icon: '🔴' },
+          { name: 'Python & Django / FastAPI', icon: '🐍' },
+          { name: 'React & Next.js', icon: '⚡' },
+          { name: 'AWS Cloud Infrastructure', icon: '☁️' },
+          { name: 'Kubernetes & Docker', icon: '🐳' },
+          { name: 'Cyber Security & OWASP', icon: '🛡️' },
+          { name: 'PostgreSQL & Redis', icon: '🐘' },
+        ],
+  });
+
+  const [newCountry, setNewCountry] = useState('');
+  const [newFlagUrl, setNewFlagUrl] = useState('');
+  const [newTechName, setNewTechName] = useState('');
+  const [newTechIcon, setNewTechIcon] = useState('⚡');
+  const [saved, setSaved] = useState(false);
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    onSave(formData);
+    setSaved(true);
+    setTimeout(() => setSaved(false), 2500);
+  };
+
+  const handleAddMarket = () => {
+    if (!newCountry.trim()) return;
+    const flag = newFlagUrl.trim() || 'https://flagcdn.com/w40/un.png';
+    setFormData({
+      ...formData,
+      targetMarkets: [...formData.targetMarkets, { country: newCountry.trim(), flagUrl: flag }],
+    });
+    setNewCountry('');
+    setNewFlagUrl('');
+  };
+
+  const handleRemoveMarket = (index) => {
+    setFormData({
+      ...formData,
+      targetMarkets: formData.targetMarkets.filter((_, i) => i !== index),
+    });
+  };
+
+  const handleAddTech = () => {
+    if (!newTechName.trim()) return;
+    setFormData({
+      ...formData,
+      techLogos: [...formData.techLogos, { name: newTechName.trim(), icon: newTechIcon.trim() || '⚡' }],
+    });
+    setNewTechName('');
+    setNewTechIcon('⚡');
+  };
+
+  const handleRemoveTech = (index) => {
+    setFormData({
+      ...formData,
+      techLogos: formData.techLogos.filter((_, i) => i !== index),
+    });
+  };
+
+  return (
+    <div className="space-y-6">
+      <div className="border-b border-slate-200/80 pb-4 flex items-center justify-between">
+        <div>
+          <h2 className="text-xl font-bold text-slate-900 tracking-tight">Enterprise Markets & Tech Stack Ribbon</h2>
+          <p className="text-xs text-slate-500 mt-1">Manage target international client markets, country flags, compliance badges, and technology stack pills.</p>
+        </div>
+        {saved && (
+          <span className="text-xs text-emerald-700 bg-emerald-50 border border-emerald-200 px-2.5 py-1 rounded-full flex items-center gap-1 font-medium">
+            <Check className="w-3.5 h-3.5" /> Changes Applied
+          </span>
+        )}
+      </div>
+
+      <form onSubmit={handleSubmit} className="space-y-6">
+        {/* Banner Copy & Safeguard Badge */}
+        <div className="bg-white border border-slate-200/80 rounded-xl p-6 shadow-xs space-y-4">
+          <h3 className="text-sm font-semibold text-slate-900 pb-2 border-b border-slate-100">Ribbon Copy & Compliance</h3>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div className="space-y-1.5">
+              <label className="text-xs font-semibold text-slate-700">Prefix Headline</label>
+              <input
+                type="text"
+                value={formData.headline}
+                onChange={(e) => setFormData({ ...formData, headline: e.target.value })}
+                className="w-full px-3.5 py-2.5 rounded-lg bg-white border border-slate-300 text-slate-900 text-xs focus:outline-none focus:ring-2 focus:ring-blue-600/20 focus:border-blue-600 shadow-2xs"
+              />
+            </div>
+            <div className="space-y-1.5">
+              <label className="text-xs font-semibold text-slate-700">Legal & NDA Compliance Badge</label>
+              <input
+                type="text"
+                value={formData.legalBadge}
+                onChange={(e) => setFormData({ ...formData, legalBadge: e.target.value })}
+                className="w-full px-3.5 py-2.5 rounded-lg bg-white border border-slate-300 text-slate-900 text-xs focus:outline-none focus:ring-2 focus:ring-blue-600/20 focus:border-blue-600 shadow-2xs"
+              />
+            </div>
+          </div>
+        </div>
+
+        {/* Target Markets Management */}
+        <div className="bg-white border border-slate-200/80 rounded-xl p-6 shadow-xs space-y-4">
+          <div className="flex items-center justify-between pb-2 border-b border-slate-100">
+            <div>
+              <h3 className="text-sm font-semibold text-slate-900">Enterprise Target Markets ({formData.targetMarkets.length})</h3>
+              <p className="text-[11px] text-slate-400">Countries displayed in the global enterprise presence ticker.</p>
+            </div>
+          </div>
+
+          <div className="flex flex-wrap gap-2.5">
+            {formData.targetMarkets.map((m, idx) => (
+              <div
+                key={idx}
+                className="inline-flex items-center gap-2 px-3 py-1.5 rounded-lg bg-slate-50 border border-slate-200 text-xs text-slate-800"
+              >
+                {m.flagUrl && (
+                  <img src={m.flagUrl} alt={m.country} className="w-4 h-3 object-cover rounded-[2px]" />
+                )}
+                <span className="font-medium">{m.country}</span>
+                <button
+                  type="button"
+                  onClick={() => handleRemoveMarket(idx)}
+                  className="text-slate-400 hover:text-red-600 ml-1 cursor-pointer"
+                  title="Remove country"
+                >
+                  <Trash2 className="w-3.5 h-3.5" />
+                </button>
+              </div>
+            ))}
+          </div>
+
+          {/* Add Market Form */}
+          <div className="pt-3 border-t border-slate-100 flex flex-col sm:flex-row items-center gap-3">
+            <input
+              type="text"
+              placeholder="Country Name (e.g. Germany)"
+              value={newCountry}
+              onChange={(e) => setNewCountry(e.target.value)}
+              className="w-full sm:w-1/3 px-3 py-2 rounded-lg bg-white border border-slate-300 text-slate-900 text-xs focus:outline-none focus:ring-2 focus:ring-blue-600/20 focus:border-blue-600 shadow-2xs"
+            />
+            <input
+              type="text"
+              placeholder="Flag URL (e.g. https://flagcdn.com/w40/de.png)"
+              value={newFlagUrl}
+              onChange={(e) => setNewFlagUrl(e.target.value)}
+              className="w-full sm:flex-1 px-3 py-2 rounded-lg bg-white border border-slate-300 text-slate-900 text-xs focus:outline-none focus:ring-2 focus:ring-blue-600/20 focus:border-blue-600 shadow-2xs font-mono"
+            />
+            <button
+              type="button"
+              onClick={handleAddMarket}
+              className="w-full sm:w-auto px-4 py-2 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-semibold flex items-center justify-center gap-1.5 transition-colors cursor-pointer border border-slate-200 shrink-0"
+            >
+              <Plus className="w-3.5 h-3.5" />
+              <span>Add Market</span>
+            </button>
+          </div>
+        </div>
+
+        {/* Tech Stack Pills Management */}
+        <div className="bg-white border border-slate-200/80 rounded-xl p-6 shadow-xs space-y-4">
+          <div className="flex items-center justify-between pb-2 border-b border-slate-100">
+            <div>
+              <h3 className="text-sm font-semibold text-slate-900">Technology Stack Badges ({formData.techLogos.length})</h3>
+              <p className="text-[11px] text-slate-400">Frameworks, languages, and cloud providers showcased on the ticker ribbon.</p>
+            </div>
+          </div>
+
+          <div className="flex flex-wrap gap-2">
+            {formData.techLogos.map((tech, idx) => (
+              <div
+                key={idx}
+                className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-slate-50 border border-slate-200 text-xs text-slate-800"
+              >
+                <span>{tech.icon}</span>
+                <span className="font-medium">{tech.name}</span>
+                <button
+                  type="button"
+                  onClick={() => handleRemoveTech(idx)}
+                  className="text-slate-400 hover:text-red-600 ml-1 cursor-pointer"
+                  title="Remove badge"
+                >
+                  <Trash2 className="w-3.5 h-3.5" />
+                </button>
+              </div>
+            ))}
+          </div>
+
+          {/* Add Tech Form */}
+          <div className="pt-3 border-t border-slate-100 flex flex-col sm:flex-row items-center gap-3">
+            <input
+              type="text"
+              placeholder="Icon/Emoji (e.g. ⚡, 🚀, 🐍)"
+              value={newTechIcon}
+              onChange={(e) => setNewTechIcon(e.target.value)}
+              className="w-full sm:w-28 px-3 py-2 rounded-lg bg-white border border-slate-300 text-slate-900 text-xs focus:outline-none focus:ring-2 focus:ring-blue-600/20 focus:border-blue-600 shadow-2xs text-center"
+            />
+            <input
+              type="text"
+              placeholder="Technology Stack Name (e.g. Go & Microservices)"
+              value={newTechName}
+              onChange={(e) => setNewTechName(e.target.value)}
+              className="w-full sm:flex-1 px-3 py-2 rounded-lg bg-white border border-slate-300 text-slate-900 text-xs focus:outline-none focus:ring-2 focus:ring-blue-600/20 focus:border-blue-600 shadow-2xs"
+            />
+            <button
+              type="button"
+              onClick={handleAddTech}
+              className="w-full sm:w-auto px-4 py-2 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-semibold flex items-center justify-center gap-1.5 transition-colors cursor-pointer border border-slate-200 shrink-0"
+            >
+              <Plus className="w-3.5 h-3.5" />
+              <span>Add Stack Tag</span>
+            </button>
+          </div>
+        </div>
+
+        <button
+          type="submit"
+          className="px-5 py-2.5 rounded-lg bg-slate-900 hover:bg-slate-800 text-white font-semibold text-xs transition-colors shadow-xs flex items-center gap-2 cursor-pointer"
+        >
+          <Save className="w-3.5 h-3.5" />
+          <span>Save Ribbon Changes</span>
         </button>
       </form>
     </div>
