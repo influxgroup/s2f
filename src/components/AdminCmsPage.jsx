@@ -340,6 +340,7 @@ export default function AdminCmsPage({ onExitAdmin }) {
             <TrustTickerEditor
               trustTicker={content.trustTicker || {}}
               onSave={(updated) => updateSection('trustTicker', updated)}
+              adminToken={adminToken}
             />
           )}
 
@@ -704,7 +705,7 @@ function HeroEditor({ content = {}, onSave, adminToken }) {
 }
 
 /* ─── 1B. MARKETS & TECH STACK RIBBON EDITOR ─── */
-function TrustTickerEditor({ trustTicker = {}, onSave }) {
+function TrustTickerEditor({ trustTicker = {}, onSave, adminToken }) {
   const [formData, setFormData] = useState({
     headline: trustTicker.headline || 'Serving Enterprise Clients In:',
     legalBadge: trustTicker.legalBadge || '100% Legal & NDA Safeguarded',
@@ -733,15 +734,93 @@ function TrustTickerEditor({ trustTicker = {}, onSave }) {
 
   const [newCountry, setNewCountry] = useState('');
   const [newFlagUrl, setNewFlagUrl] = useState('');
+  const [isUploadingFlag, setIsUploadingFlag] = useState(false);
+  const [flagError, setFlagError] = useState('');
+  const flagFileInputRef = React.useRef(null);
+
   const [newTechName, setNewTechName] = useState('');
   const [newTechIcon, setNewTechIcon] = useState('⚡');
+  const [isUploadingTechIcon, setIsUploadingTechIcon] = useState(false);
+  const [techIconError, setTechIconError] = useState('');
+  const techFileInputRef = React.useRef(null);
+  const replaceFileInputRef = React.useRef(null);
+  const [replaceTargetIndex, setReplaceTargetIndex] = useState(null);
+
   const [saved, setSaved] = useState(false);
+
+  const emojiPresets = ['⚡', '⚛️', '📱', '🔴', '🐍', '☁️', '🐳', '🛡️', '🐘', '🚀', '💻', '🔥'];
 
   const handleSubmit = (e) => {
     e.preventDefault();
     onSave(formData);
     setSaved(true);
     setTimeout(() => setSaved(false), 2500);
+  };
+
+  // ── Flag Upload ──
+  const handleFlagUpload = async (e) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    if (file.size > 5 * 1024 * 1024) {
+      setFlagError('Flag image exceeds 5MB limit.');
+      return;
+    }
+
+    setIsUploadingFlag(true);
+    setFlagError('');
+
+    try {
+      const url = await uploadMedia(file, adminToken, 'flags');
+      setNewFlagUrl(url);
+    } catch (err) {
+      setFlagError(err.message || 'Flag upload failed.');
+    } finally {
+      setIsUploadingFlag(false);
+      if (flagFileInputRef.current) flagFileInputRef.current.value = '';
+    }
+  };
+
+  // ── Tech Icon Upload (New) ──
+  const handleTechIconUpload = async (e) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    if (file.size > 5 * 1024 * 1024) {
+      setTechIconError('Icon image exceeds 5MB limit.');
+      return;
+    }
+
+    setIsUploadingTechIcon(true);
+    setTechIconError('');
+
+    try {
+      const url = await uploadMedia(file, adminToken, 'tech-icons');
+      setNewTechIcon(url);
+    } catch (err) {
+      setTechIconError(err.message || 'Icon upload failed.');
+    } finally {
+      setIsUploadingTechIcon(false);
+      if (techFileInputRef.current) techFileInputRef.current.value = '';
+    }
+  };
+
+  // ── Replace Existing Badge Icon ──
+  const handleReplaceBadgeIcon = async (e) => {
+    const file = e.target.files?.[0];
+    if (!file || replaceTargetIndex === null) return;
+
+    try {
+      const url = await uploadMedia(file, adminToken, 'tech-icons');
+      const updated = [...formData.techLogos];
+      updated[replaceTargetIndex] = { ...updated[replaceTargetIndex], icon: url };
+      setFormData({ ...formData, techLogos: updated });
+    } catch (err) {
+      alert(err.message || 'Failed to replace icon.');
+    } finally {
+      setReplaceTargetIndex(null);
+      if (replaceFileInputRef.current) replaceFileInputRef.current.value = '';
+    }
   };
 
   const handleAddMarket = () => {
@@ -779,12 +858,19 @@ function TrustTickerEditor({ trustTicker = {}, onSave }) {
     });
   };
 
+  const isIconImageUrl = (icon) => typeof icon === 'string' && (
+    icon.startsWith('http://') ||
+    icon.startsWith('https://') ||
+    icon.startsWith('data:image/') ||
+    icon.startsWith('/')
+  );
+
   return (
     <div className="space-y-6">
       <div className="border-b border-slate-200/80 pb-4 flex items-center justify-between">
         <div>
           <h2 className="text-xl font-bold text-slate-900 tracking-tight">Enterprise Markets & Tech Stack Ribbon</h2>
-          <p className="text-xs text-slate-500 mt-1">Manage target international client markets, country flags, compliance badges, and technology stack pills.</p>
+          <p className="text-xs text-slate-500 mt-1">Manage target international client markets, country flags, compliance badges, and technology stack pills with uploadable icons.</p>
         </div>
         {saved && (
           <span className="text-xs text-emerald-700 bg-emerald-50 border border-emerald-200 px-2.5 py-1 rounded-full flex items-center gap-1 font-medium">
@@ -832,10 +918,10 @@ function TrustTickerEditor({ trustTicker = {}, onSave }) {
             {formData.targetMarkets.map((m, idx) => (
               <div
                 key={idx}
-                className="inline-flex items-center gap-2 px-3 py-1.5 rounded-lg bg-slate-50 border border-slate-200 text-xs text-slate-800"
+                className="inline-flex items-center gap-2 px-3 py-1.5 rounded-lg bg-slate-50 border border-slate-200 text-xs text-slate-800 shadow-2xs"
               >
                 {m.flagUrl && (
-                  <img src={m.flagUrl} alt={m.country} className="w-4 h-3 object-cover rounded-[2px]" />
+                  <img src={m.flagUrl} alt={m.country} className="w-4.5 h-3 object-cover rounded-[2px] shrink-0 shadow-xs" />
                 )}
                 <span className="font-medium">{m.country}</span>
                 <button
@@ -850,30 +936,64 @@ function TrustTickerEditor({ trustTicker = {}, onSave }) {
             ))}
           </div>
 
-          {/* Add Market Form */}
-          <div className="pt-3 border-t border-slate-100 flex flex-col sm:flex-row items-center gap-3">
-            <input
-              type="text"
-              placeholder="Country Name (e.g. Germany)"
-              value={newCountry}
-              onChange={(e) => setNewCountry(e.target.value)}
-              className="w-full sm:w-1/3 px-3 py-2 rounded-lg bg-white border border-slate-300 text-slate-900 text-xs focus:outline-none focus:ring-2 focus:ring-blue-600/20 focus:border-blue-600 shadow-2xs"
-            />
-            <input
-              type="text"
-              placeholder="Flag URL (e.g. https://flagcdn.com/w40/de.png)"
-              value={newFlagUrl}
-              onChange={(e) => setNewFlagUrl(e.target.value)}
-              className="w-full sm:flex-1 px-3 py-2 rounded-lg bg-white border border-slate-300 text-slate-900 text-xs focus:outline-none focus:ring-2 focus:ring-blue-600/20 focus:border-blue-600 shadow-2xs font-mono"
-            />
-            <button
-              type="button"
-              onClick={handleAddMarket}
-              className="w-full sm:w-auto px-4 py-2 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-semibold flex items-center justify-center gap-1.5 transition-colors cursor-pointer border border-slate-200 shrink-0"
-            >
-              <Plus className="w-3.5 h-3.5" />
-              <span>Add Market</span>
-            </button>
+          {/* Add Market Form with File Upload */}
+          <div className="pt-3 border-t border-slate-100 space-y-2">
+            <div className="flex flex-col sm:flex-row items-center gap-2.5">
+              <input
+                type="text"
+                placeholder="Country Name (e.g. Germany)"
+                value={newCountry}
+                onChange={(e) => setNewCountry(e.target.value)}
+                className="w-full sm:w-1/3 px-3 py-2 rounded-lg bg-white border border-slate-300 text-slate-900 text-xs focus:outline-none focus:ring-2 focus:ring-blue-600/20 focus:border-blue-600 shadow-2xs"
+              />
+
+              <div className="flex-1 w-full flex items-center gap-2">
+                {newFlagUrl ? (
+                  <img src={newFlagUrl} alt="Flag Preview" className="w-5 h-3.5 object-cover rounded-[2px] border border-slate-300 shrink-0" />
+                ) : (
+                  <span className="w-5 h-3.5 bg-slate-100 border border-slate-300 rounded-[2px] shrink-0" />
+                )}
+
+                <input
+                  type="text"
+                  placeholder="Flag URL or Upload file"
+                  value={newFlagUrl}
+                  onChange={(e) => setNewFlagUrl(e.target.value)}
+                  className="flex-1 px-3 py-2 rounded-lg bg-white border border-slate-300 text-slate-900 text-xs focus:outline-none focus:ring-2 focus:ring-blue-600/20 focus:border-blue-600 shadow-2xs font-mono"
+                />
+
+                <input
+                  ref={flagFileInputRef}
+                  type="file"
+                  accept="image/png,image/jpeg,image/webp,image/svg+xml,image/gif"
+                  onChange={handleFlagUpload}
+                  className="hidden"
+                />
+                <button
+                  type="button"
+                  disabled={isUploadingFlag}
+                  onClick={() => flagFileInputRef.current?.click()}
+                  className="px-3 py-2 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-medium flex items-center gap-1.5 transition-colors cursor-pointer border border-slate-200 shrink-0 shadow-2xs disabled:opacity-50"
+                  title="Upload Flag image file"
+                >
+                  {isUploadingFlag ? <Loader2 className="w-3.5 h-3.5 animate-spin text-blue-600" /> : <Upload className="w-3.5 h-3.5 text-slate-500" />}
+                  <span>{isUploadingFlag ? 'Uploading...' : 'Upload Flag'}</span>
+                </button>
+              </div>
+
+              <button
+                type="button"
+                onClick={handleAddMarket}
+                className="w-full sm:w-auto px-4 py-2 rounded-lg bg-slate-900 hover:bg-slate-800 text-white text-xs font-semibold flex items-center justify-center gap-1.5 transition-colors cursor-pointer shrink-0 shadow-xs"
+              >
+                <Plus className="w-3.5 h-3.5" />
+                <span>Add Market</span>
+              </button>
+            </div>
+
+            {flagError && (
+              <p className="text-[11px] text-red-600 font-medium">{flagError}</p>
+            )}
           </div>
         </div>
 
@@ -882,54 +1002,162 @@ function TrustTickerEditor({ trustTicker = {}, onSave }) {
           <div className="flex items-center justify-between pb-2 border-b border-slate-100">
             <div>
               <h3 className="text-sm font-semibold text-slate-900">Technology Stack Badges ({formData.techLogos.length})</h3>
-              <p className="text-[11px] text-slate-400">Frameworks, languages, and cloud providers showcased on the ticker ribbon.</p>
+              <p className="text-[11px] text-slate-400">Frameworks, languages, and cloud providers showcased on the ticker ribbon. Icons auto-fit fixed dimensions.</p>
             </div>
           </div>
 
-          <div className="flex flex-wrap gap-2">
-            {formData.techLogos.map((tech, idx) => (
-              <div
-                key={idx}
-                className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-slate-50 border border-slate-200 text-xs text-slate-800"
-              >
-                <span>{tech.icon}</span>
-                <span className="font-medium">{tech.name}</span>
-                <button
-                  type="button"
-                  onClick={() => handleRemoveTech(idx)}
-                  className="text-slate-400 hover:text-red-600 ml-1 cursor-pointer"
-                  title="Remove badge"
+          {/* Hidden file input for replacing existing badge icon */}
+          <input
+            ref={replaceFileInputRef}
+            type="file"
+            accept="image/png,image/jpeg,image/webp,image/svg+xml,image/gif"
+            onChange={handleReplaceBadgeIcon}
+            className="hidden"
+          />
+
+          <div className="flex flex-wrap gap-2.5">
+            {formData.techLogos.map((tech, idx) => {
+              const isImg = isIconImageUrl(tech.icon);
+
+              return (
+                <div
+                  key={idx}
+                  className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-slate-50 border border-slate-200 text-xs text-slate-800 shadow-2xs hover:border-slate-300 transition-colors group"
                 >
-                  <Trash2 className="w-3.5 h-3.5" />
-                </button>
-              </div>
-            ))}
+                  {/* Fixed Dimension Icon Container */}
+                  <div className="w-4 h-4 min-w-[16px] max-w-[16px] max-h-[16px] flex items-center justify-center overflow-hidden shrink-0">
+                    {isImg ? (
+                      <img src={tech.icon} alt={tech.name} className="w-full h-full object-contain" />
+                    ) : (
+                      <span className="text-xs leading-none">{tech.icon}</span>
+                    )}
+                  </div>
+
+                  <span className="font-medium">{tech.name}</span>
+
+                  <div className="flex items-center gap-1 border-l border-slate-200 pl-1.5 ml-0.5">
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setReplaceTargetIndex(idx);
+                        replaceFileInputRef.current?.click();
+                      }}
+                      className="text-slate-400 hover:text-blue-600 cursor-pointer transition-colors p-0.5"
+                      title="Upload new icon for this badge"
+                    >
+                      <Upload className="w-3 h-3" />
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => handleRemoveTech(idx)}
+                      className="text-slate-400 hover:text-red-600 cursor-pointer transition-colors p-0.5"
+                      title="Remove badge"
+                    >
+                      <Trash2 className="w-3 h-3" />
+                    </button>
+                  </div>
+                </div>
+              );
+            })}
           </div>
 
-          {/* Add Tech Form */}
-          <div className="pt-3 border-t border-slate-100 flex flex-col sm:flex-row items-center gap-3">
-            <input
-              type="text"
-              placeholder="Icon/Emoji (e.g. ⚡, 🚀, 🐍)"
-              value={newTechIcon}
-              onChange={(e) => setNewTechIcon(e.target.value)}
-              className="w-full sm:w-28 px-3 py-2 rounded-lg bg-white border border-slate-300 text-slate-900 text-xs focus:outline-none focus:ring-2 focus:ring-blue-600/20 focus:border-blue-600 shadow-2xs text-center"
-            />
-            <input
-              type="text"
-              placeholder="Technology Stack Name (e.g. Go & Microservices)"
-              value={newTechName}
-              onChange={(e) => setNewTechName(e.target.value)}
-              className="w-full sm:flex-1 px-3 py-2 rounded-lg bg-white border border-slate-300 text-slate-900 text-xs focus:outline-none focus:ring-2 focus:ring-blue-600/20 focus:border-blue-600 shadow-2xs"
-            />
-            <button
-              type="button"
-              onClick={handleAddTech}
-              className="w-full sm:w-auto px-4 py-2 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-semibold flex items-center justify-center gap-1.5 transition-colors cursor-pointer border border-slate-200 shrink-0"
-            >
-              <Plus className="w-3.5 h-3.5" />
-              <span>Add Stack Tag</span>
-            </button>
+          {/* Add Tech Form with Live Preview & Dedicated Upload Button */}
+          <div className="pt-4 border-t border-slate-100 space-y-3">
+            <div className="flex items-center justify-between">
+              <span className="text-xs font-semibold text-slate-700">Add New Technology Stack Badge</span>
+              {/* Quick Emoji Preset Chips */}
+              <div className="flex items-center gap-1">
+                <span className="text-[10px] text-slate-400 mr-1 hidden sm:inline">Quick Presets:</span>
+                {emojiPresets.map((em, pIdx) => (
+                  <button
+                    key={pIdx}
+                    type="button"
+                    onClick={() => setNewTechIcon(em)}
+                    className="w-6 h-6 rounded-md hover:bg-slate-100 text-xs flex items-center justify-center transition-colors cursor-pointer border border-transparent hover:border-slate-200"
+                    title={`Use ${em}`}
+                  >
+                    {em}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            <div className="flex flex-col sm:flex-row items-center gap-2.5">
+              {/* Fixed Dimension Icon Preview Box (Strictly enforces fixed box, object-contain) */}
+              <div
+                className="w-10 h-10 min-w-[40px] max-w-[40px] rounded-lg border border-slate-300 bg-slate-50 flex items-center justify-center overflow-hidden shrink-0 shadow-2xs"
+                title="Fixed Dimension Icon Preview (Will display at 16x16px on live ribbon)"
+              >
+                {isIconImageUrl(newTechIcon) ? (
+                  <img src={newTechIcon} alt="Preview" className="w-5 h-5 object-contain" />
+                ) : (
+                  <span className="text-base leading-none">{newTechIcon || '⚡'}</span>
+                )}
+              </div>
+
+              {/* Upload Icon File Button */}
+              <input
+                ref={techFileInputRef}
+                type="file"
+                accept="image/png,image/jpeg,image/webp,image/svg+xml,image/gif"
+                onChange={handleTechIconUpload}
+                className="hidden"
+              />
+              <button
+                type="button"
+                disabled={isUploadingTechIcon}
+                onClick={() => techFileInputRef.current?.click()}
+                className="w-full sm:w-auto px-3.5 py-2.5 rounded-lg bg-blue-50 hover:bg-blue-100 text-blue-700 text-xs font-medium flex items-center justify-center gap-1.5 transition-colors cursor-pointer border border-blue-200 shrink-0 shadow-2xs disabled:opacity-50"
+              >
+                {isUploadingTechIcon ? (
+                  <>
+                    <Loader2 className="w-3.5 h-3.5 animate-spin text-blue-600" />
+                    <span>Uploading...</span>
+                  </>
+                ) : (
+                  <>
+                    <Upload className="w-3.5 h-3.5 text-blue-600" />
+                    <span>Upload Icon File</span>
+                  </>
+                )}
+              </button>
+
+              {/* Text Input for Custom Emoji or External URL */}
+              <input
+                type="text"
+                placeholder="Or type emoji / image URL"
+                value={newTechIcon}
+                onChange={(e) => setNewTechIcon(e.target.value)}
+                className="w-full sm:w-44 px-3 py-2 rounded-lg bg-white border border-slate-300 text-slate-900 text-xs focus:outline-none focus:ring-2 focus:ring-blue-600/20 focus:border-blue-600 shadow-2xs font-mono"
+              />
+
+              {/* Tech Stack Name */}
+              <input
+                type="text"
+                placeholder="Technology Stack Name (e.g. React & Node js)"
+                value={newTechName}
+                onChange={(e) => setNewTechName(e.target.value)}
+                className="w-full sm:flex-1 px-3 py-2 rounded-lg bg-white border border-slate-300 text-slate-900 text-xs focus:outline-none focus:ring-2 focus:ring-blue-600/20 focus:border-blue-600 shadow-2xs"
+              />
+
+              {/* Submit Add Tag */}
+              <button
+                type="button"
+                onClick={handleAddTech}
+                className="w-full sm:w-auto px-4 py-2 rounded-lg bg-slate-900 hover:bg-slate-800 text-white text-xs font-semibold flex items-center justify-center gap-1.5 transition-colors cursor-pointer shrink-0 shadow-xs"
+              >
+                <Plus className="w-3.5 h-3.5" />
+                <span>Add Stack Tag</span>
+              </button>
+            </div>
+
+            {techIconError && (
+              <p className="text-[11px] text-red-600 font-medium">{techIconError}</p>
+            )}
+
+            <p className="text-[10px] text-slate-400">
+              * Any uploaded image (PNG, SVG, JPG, WebP) is automatically scaled to fit the fixed 16×16px container on the ribbon without distortion.
+            </p>
           </div>
         </div>
 

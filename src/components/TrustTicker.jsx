@@ -74,15 +74,32 @@ export default function TrustTicker() {
 
         {/* Tech Stack Pills Ribbon */}
         <div className="flex flex-wrap items-center justify-center gap-2.5 pt-1 border-t border-white/5">
-          {techLogos.map((tech, i) => (
-            <div
-              key={i}
-              className="flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-[#0f1d31]/80 border border-blue-800/30 text-xs font-semibold text-slate-300 hover:border-blue-500/50 hover:text-white transition-all cursor-default"
-            >
-              <span>{tech.icon}</span>
-              <span>{tech.name}</span>
-            </div>
-          ))}
+          {techLogos.map((tech, i) => {
+            const isImageUrl = typeof tech.icon === 'string' && (
+              tech.icon.startsWith('http://') ||
+              tech.icon.startsWith('https://') ||
+              tech.icon.startsWith('data:image/') ||
+              tech.icon.startsWith('/')
+            );
+
+            return (
+              <div
+                key={i}
+                className="flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-[#0f1d31]/80 border border-blue-800/30 text-xs font-semibold text-slate-300 hover:border-blue-500/50 hover:text-white transition-all cursor-default"
+              >
+                {isImageUrl ? (
+                  <img
+                    src={tech.icon}
+                    alt={tech.name}
+                    className="w-4 h-4 min-w-[16px] max-w-[16px] max-h-[16px] object-contain shrink-0"
+                  />
+                ) : (
+                  <span className="shrink-0 text-xs leading-none">{tech.icon}</span>
+                )}
+                <span>{tech.name}</span>
+              </div>
+            );
+          })}
         </div>
 
       </div>
