@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import { useCms } from '../context/CmsContext';
 import { Search, BookOpen, Clock, ArrowRight, ArrowLeft, Tag, Sparkles, Send, CheckCircle2, X, Eye, Heart, Rocket, Lightbulb, ThumbsUp, Share2, Link2, MessageSquare, Calendar, Archive, Flame, Globe } from 'lucide-react';
 
@@ -131,14 +131,6 @@ export default function BlogPage({ openDiscoveryModal }) {
   const [newCommentName, setNewCommentName] = useState('');
   const [newCommentText, setNewCommentText] = useState('');
 
-  const categories = ['All', 'Engineering Standards', 'Engineering Leadership', 'Cloud & DevOps', 'AI & Machine Learning'];
-
-  const archives = [
-    { label: 'July 2026', count: 4 },
-    { label: 'June 2026', count: 3 },
-    { label: 'May 2026', count: 2 }
-  ];
-
   const rawArticles = Array.isArray(content?.blog) ? content.blog : fallbackArticles;
   const articles = rawArticles.map(art => ({
     ...art,
@@ -149,6 +141,39 @@ export default function BlogPage({ openDiscoveryModal }) {
     authorAvatar: art.authorAvatar || 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=400&q=80',
     content: art.content || art.summary || art.excerpt || '',
   }));
+
+  // Dynamically derive categories from active articles
+  const categories = useMemo(() => {
+    if (!articles || articles.length === 0) return ['All'];
+    const articleCats = articles.map(a => a.category).filter(Boolean);
+    return ['All', ...Array.from(new Set(articleCats))];
+  }, [articles]);
+
+  // Dynamically derive archives from active articles
+  const archives = useMemo(() => {
+    if (!articles || articles.length === 0) return [];
+    const map = {};
+    articles.forEach(art => {
+      const month = art.archiveMonth || (art.date ? new Date(art.date).toLocaleDateString('en-US', { month: 'long', year: 'numeric' }) : null);
+      if (month && month !== 'Invalid Date') {
+        map[month] = (map[month] || 0) + 1;
+      }
+    });
+    return Object.entries(map).map(([label, count]) => ({ label, count }));
+  }, [articles]);
+
+  // Dynamically derive topics from active articles
+  const popularTopics = useMemo(() => {
+    if (!articles || articles.length === 0) return [];
+    return Array.from(new Set(articles.map(a => a.category).filter(Boolean)));
+  }, [articles]);
+
+  // Reset activeArchive if the selected month no longer exists in dynamic archives
+  useEffect(() => {
+    if (activeArchive && !archives.some(a => a.label === activeArchive)) {
+      setActiveArchive(null);
+    }
+  }, [archives, activeArchive]);
 
   // Increment reaction
   const handleReaction = (artId, type) => {
@@ -688,27 +713,31 @@ export default function BlogPage({ openDiscoveryModal }) {
               </div>
 
               <div className="space-y-1.5">
-                {archives.map((arch) => (
-                  <button
-                    key={arch.label}
-                    onClick={() => {
-                      setActiveArchive(activeArchive === arch.label ? null : arch.label);
-                    }}
-                    className={`w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl text-xs font-bold transition-all cursor-pointer ${
-                      activeArchive === arch.label
-                        ? 'bg-[#2563eb] text-white shadow-sm'
-                        : 'bg-[#f4f8f4] text-slate-700 hover:bg-[#e0e8f4]'
-                    }`}
-                  >
-                    <span className="flex items-center gap-2">
-                      <Calendar className="w-3.5 h-3.5 text-slate-400" />
-                      <span>{arch.label}</span>
-                    </span>
-                    <span className={`text-[10px] px-2 py-0.5 rounded-full font-extrabold ${activeArchive === arch.label ? 'bg-white/20 text-white' : 'bg-slate-200 text-slate-700'}`}>
-                      {arch.count} articles
-                    </span>
-                  </button>
-                ))}
+                {archives.length === 0 ? (
+                  <p className="text-xs text-slate-400 italic">No archive records available.</p>
+                ) : (
+                  archives.map((arch) => (
+                    <button
+                      key={arch.label}
+                      onClick={() => {
+                        setActiveArchive(activeArchive === arch.label ? null : arch.label);
+                      }}
+                      className={`w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl text-xs font-bold transition-all cursor-pointer ${
+                        activeArchive === arch.label
+                          ? 'bg-[#2563eb] text-white shadow-sm'
+                          : 'bg-[#f4f8f4] text-slate-700 hover:bg-[#e0e8f4]'
+                      }`}
+                    >
+                      <span className="flex items-center gap-2">
+                        <Calendar className="w-3.5 h-3.5 text-slate-400" />
+                        <span>{arch.label}</span>
+                      </span>
+                      <span className={`text-[10px] px-2 py-0.5 rounded-full font-extrabold ${activeArchive === arch.label ? 'bg-white/20 text-white' : 'bg-slate-200 text-slate-700'}`}>
+                        {arch.count} {arch.count === 1 ? 'article' : 'articles'}
+                      </span>
+                    </button>
+                  ))
+                )}
               </div>
             </div>
 
@@ -756,17 +785,21 @@ export default function BlogPage({ openDiscoveryModal }) {
               </div>
 
               <div className="flex flex-wrap gap-1.5">
-                {['Engineering Standards', 'Engineering SLAs', 'Dual NDAs', 'DevOps & AWS', 'Python RAG', 'React Squads', 'Timezone Overlap'].map((topic) => (
-                  <span
-                    key={topic}
-                    onClick={() => {
-                      setSearchTerm(topic);
-                    }}
-                    className="bg-[#e0e8f4] hover:bg-[#2563eb] hover:text-white text-[#0f1d31] text-[11px] font-extrabold px-3 py-1 rounded-xl cursor-pointer transition-all border border-[#b8c8e0]"
-                  >
-                    #{topic}
-                  </span>
-                ))}
+                {popularTopics.length === 0 ? (
+                  <p className="text-xs text-slate-400 italic">No topics available yet.</p>
+                ) : (
+                  popularTopics.map((topic) => (
+                    <span
+                      key={topic}
+                      onClick={() => {
+                        setSearchTerm(topic);
+                      }}
+                      className="bg-[#e0e8f4] hover:bg-[#2563eb] hover:text-white text-[#0f1d31] text-[11px] font-extrabold px-3 py-1 rounded-xl cursor-pointer transition-all border border-[#b8c8e0]"
+                    >
+                      #{topic}
+                    </span>
+                  ))
+                )}
               </div>
             </div>
 
