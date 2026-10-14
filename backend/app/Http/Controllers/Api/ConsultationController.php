@@ -3,9 +3,13 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Mail\ConsultationConfirmationMail;
+use App\Mail\NewConsultationAdminMail;
 use App\Models\Consultation;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Validator;
 
 class ConsultationController extends Controller
@@ -45,6 +49,23 @@ class ConsultationController extends Controller
             'ip_address' => $request->ip(),
             'user_agent' => substr((string) $request->header('User-Agent'), 0, 500),
         ]);
+
+        // Dispatch transactional emails
+        try {
+            $adminEmail = env('ADMIN_NOTIFICATION_EMAIL', config('mail.from.address', 'admin@sovereign2freshempire.com'));
+            if (!empty($adminEmail)) {
+                Mail::to($adminEmail)->send(new NewConsultationAdminMail($consultation));
+            }
+
+            if (!empty($consultation->email)) {
+                Mail::to($consultation->email)->send(new ConsultationConfirmationMail($consultation));
+            }
+        } catch (\Throwable $e) {
+            Log::error('Consultation email dispatch error: ' . $e->getMessage(), [
+                'consultation_id' => $consultation->id,
+                'trace' => $e->getTraceAsString(),
+            ]);
+        }
 
         return response()->json([
             'success' => true,
