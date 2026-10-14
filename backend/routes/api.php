@@ -4,6 +4,7 @@ use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\CmsController;
 use App\Http\Controllers\Api\ConsultationController;
 use App\Http\Controllers\Api\InquiryController;
+use App\Http\Controllers\Api\MediaController;
 use App\Http\Controllers\Api\SubscriberController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
@@ -63,6 +64,9 @@ Route::prefix('v1')->group(function () {
             // CMS Content Management
             Route::post('/content', [CmsController::class, 'bulkUpdate']);
             Route::post('/content/{key}', [CmsController::class, 'update']);
+
+            // Media & Asset Upload
+            Route::post('/media/upload', [MediaController::class, 'upload']);
         });
     });
 });

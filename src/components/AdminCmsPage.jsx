@@ -5,7 +5,8 @@ import {
   updateInquiryStatus,
   fetchAdminConsultations,
   updateConsultationStatus,
-  fetchAdminSubscribers
+  fetchAdminSubscribers,
+  uploadMedia
 } from '../services/api';
 import {
   LayoutDashboard,
@@ -34,7 +35,10 @@ import {
   Eye,
   ArrowLeft,
   ChevronRight,
-  ExternalLink
+  ExternalLink,
+  Upload,
+  Image,
+  Loader2
 } from 'lucide-react';
 import s2fLogoHeader from '../assets/s2f_logo_header.png';
 
@@ -322,7 +326,11 @@ export default function AdminCmsPage({ onExitAdmin }) {
           
           {/* TAB 1: HERO & HEADLINES */}
           {activeSection === 'hero' && (
-            <HeroEditor content={content.hero} onSave={(updated) => updateSection('hero', updated)} />
+            <HeroEditor
+              content={content.hero}
+              onSave={(updated) => updateSection('hero', updated)}
+              adminToken={adminToken}
+            />
           )}
 
           {/* TAB 2: SERVICES & CAPABILITIES */}
@@ -330,6 +338,7 @@ export default function AdminCmsPage({ onExitAdmin }) {
             <ServicesEditor
               services={content.services || []}
               onSave={(updated) => updateSection('services', updated)}
+              adminToken={adminToken}
             />
           )}
 
@@ -354,6 +363,7 @@ export default function AdminCmsPage({ onExitAdmin }) {
             <PortfolioEditor
               portfolio={content.portfolio || []}
               onSave={(updated) => updateSection('portfolio', updated)}
+              adminToken={adminToken}
             />
           )}
 
@@ -362,6 +372,7 @@ export default function AdminCmsPage({ onExitAdmin }) {
             <BlogEditor
               blog={content.blog || []}
               onSave={(updated) => updateSection('blog', updated)}
+              adminToken={adminToken}
             />
           )}
 
@@ -393,11 +404,130 @@ export default function AdminCmsPage({ onExitAdmin }) {
 }
 
 // ─────────────────────────────────────────────────────────────
+// REUSABLE IMAGE UPLOAD & PREVIEW COMPONENT
+// ─────────────────────────────────────────────────────────────
+function ImageUploadField({ label = 'Image', value = '', onChange, adminToken, folder = 'cms' }) {
+  const [isUploading, setIsUploading] = useState(false);
+  const [uploadError, setUploadError] = useState('');
+  const fileInputRef = React.useRef(null);
+
+  const handleFileChange = async (e) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    if (file.size > 10 * 1024 * 1024) {
+      setUploadError('File exceeds max size limit of 10MB.');
+      return;
+    }
+
+    setIsUploading(true);
+    setUploadError('');
+
+    try {
+      const url = await uploadMedia(file, adminToken, folder);
+      onChange(url);
+    } catch (err) {
+      console.error('Image upload error:', err);
+      setUploadError(err.message || 'Image upload failed. Please try again.');
+    } finally {
+      setIsUploading(false);
+      if (fileInputRef.current) {
+        fileInputRef.current.value = '';
+      }
+    }
+  };
+
+  return (
+    <div className="space-y-1.5">
+      <div className="flex items-center justify-between">
+        <label className="text-[11px] font-semibold text-slate-700">{label}</label>
+        {value && (
+          <button
+            type="button"
+            onClick={() => onChange('')}
+            className="text-[10px] text-slate-400 hover:text-red-600 transition-colors cursor-pointer"
+          >
+            Clear Image
+          </button>
+        )}
+      </div>
+
+      <div className="flex items-start gap-3">
+        {/* Thumbnail Preview */}
+        <div className="w-16 h-16 rounded-lg border border-slate-200 bg-slate-50 flex items-center justify-center overflow-hidden shrink-0 shadow-2xs relative">
+          {value ? (
+            <img
+              src={value}
+              alt="Preview"
+              className="w-full h-full object-cover"
+              onError={(e) => {
+                e.target.style.display = 'none';
+              }}
+            />
+          ) : (
+            <Image className="w-6 h-6 text-slate-300" />
+          )}
+          {isUploading && (
+            <div className="absolute inset-0 bg-white/80 backdrop-blur-xs flex items-center justify-center">
+              <Loader2 className="w-4 h-4 text-blue-600 animate-spin" />
+            </div>
+          )}
+        </div>
+
+        {/* Upload Button & URL field */}
+        <div className="flex-1 space-y-1.5">
+          <div className="flex items-center gap-2">
+            <input
+              ref={fileInputRef}
+              type="file"
+              accept="image/png,image/jpeg,image/webp,image/svg+xml,image/gif"
+              onChange={handleFileChange}
+              className="hidden"
+            />
+            <button
+              type="button"
+              disabled={isUploading}
+              onClick={() => fileInputRef.current?.click()}
+              className="px-3 py-1.5 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-700 border border-slate-200 text-xs font-medium flex items-center gap-1.5 transition-colors cursor-pointer disabled:opacity-50 shadow-2xs"
+            >
+              {isUploading ? (
+                <>
+                  <Loader2 className="w-3.5 h-3.5 animate-spin text-blue-600" />
+                  <span>Uploading to Server...</span>
+                </>
+              ) : (
+                <>
+                  <Upload className="w-3.5 h-3.5 text-slate-600" />
+                  <span>Upload Image File</span>
+                </>
+              )}
+            </button>
+            <span className="text-[10px] text-slate-400">PNG, JPG, WebP up to 10MB</span>
+          </div>
+
+          <input
+            type="text"
+            value={value || ''}
+            onChange={(e) => onChange(e.target.value)}
+            placeholder="Or paste external image URL (e.g. https://...)"
+            className="w-full px-2.5 py-1.5 rounded-md bg-white border border-slate-300 text-slate-900 text-[11px] placeholder:text-slate-400 focus:outline-none focus:ring-1 focus:ring-blue-600 focus:border-blue-600 shadow-2xs font-mono"
+          />
+
+          {uploadError && (
+            <p className="text-[11px] text-red-600 font-medium">{uploadError}</p>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// ─────────────────────────────────────────────────────────────
 // SUB-EDITORS FOR EACH INDIVIDUAL PAGE SECTION
 // ─────────────────────────────────────────────────────────────
 
 /* ─── 1. HERO SECTION EDITOR ─── */
-function HeroEditor({ content = {}, onSave }) {
+function HeroEditor({ content = {}, onSave, adminToken }) {
   const [formData, setFormData] = useState(content);
   const [saved, setSaved] = useState(false);
 
@@ -413,7 +543,7 @@ function HeroEditor({ content = {}, onSave }) {
       <div className="border-b border-slate-200/80 pb-4 flex items-center justify-between">
         <div>
           <h2 className="text-xl font-bold text-slate-900 tracking-tight">Hero Section & Headline Settings</h2>
-          <p className="text-xs text-slate-500 mt-1">Configure primary value proposition, CTAs, and counter ribbon metrics.</p>
+          <p className="text-xs text-slate-500 mt-1">Configure primary value proposition, CTAs, executive lead image, and counter ribbon metrics.</p>
         </div>
         {saved && (
           <span className="text-xs text-emerald-700 bg-emerald-50 border border-emerald-200 px-2.5 py-1 rounded-full flex items-center gap-1 font-medium">
@@ -496,6 +626,16 @@ function HeroEditor({ content = {}, onSave }) {
               className="w-full px-3.5 py-2.5 rounded-lg bg-white border border-slate-300 text-slate-900 text-xs focus:outline-none focus:ring-2 focus:ring-blue-600/20 focus:border-blue-600 transition-all shadow-2xs"
             />
           </div>
+
+          <div className="pt-2 border-t border-slate-100">
+            <ImageUploadField
+              label="Hero Executive / Showcase Lead Image"
+              value={formData.image || ''}
+              onChange={(url) => setFormData({ ...formData, image: url })}
+              adminToken={adminToken}
+              folder="hero"
+            />
+          </div>
         </div>
 
         {/* Counter Ribbon Metrics */}
@@ -554,7 +694,7 @@ function HeroEditor({ content = {}, onSave }) {
 }
 
 /* ─── 2. SERVICES EDITOR ─── */
-function ServicesEditor({ services = [], onSave }) {
+function ServicesEditor({ services = [], onSave, adminToken }) {
   const [list, setList] = useState(services);
   const [editingIndex, setEditingIndex] = useState(null);
 
@@ -614,6 +754,7 @@ function ServicesEditor({ services = [], onSave }) {
                 data={service}
                 onSave={(updated) => handleUpdate(idx, updated)}
                 onCancel={() => setEditingIndex(null)}
+                adminToken={adminToken}
               />
             ) : (
               <>
@@ -659,7 +800,7 @@ function ServicesEditor({ services = [], onSave }) {
   );
 }
 
-function ServiceForm({ data, onSave, onCancel }) {
+function ServiceForm({ data, onSave, onCancel, adminToken }) {
   const [formData, setFormData] = useState(data);
 
   return (
@@ -706,15 +847,13 @@ function ServiceForm({ data, onSave, onCancel }) {
         />
       </div>
 
-      <div className="space-y-1">
-        <label className="text-[11px] font-semibold text-slate-700">Cover Image URL</label>
-        <input
-          type="text"
-          value={formData.image || ''}
-          onChange={(e) => setFormData({ ...formData, image: e.target.value })}
-          className="w-full px-3 py-1.5 rounded-lg bg-white border border-slate-300 text-slate-900 text-xs focus:ring-2 focus:ring-blue-600/20 focus:border-blue-600"
-        />
-      </div>
+      <ImageUploadField
+        label="Service Cover Image"
+        value={formData.image || ''}
+        onChange={(url) => setFormData({ ...formData, image: url })}
+        adminToken={adminToken}
+        folder="services"
+      />
 
       <div className="flex items-center justify-end gap-2 pt-2">
         <button
@@ -985,7 +1124,7 @@ function MatrixEditor({ matrix = [], onSave }) {
 }
 
 /* ─── 5. PORTFOLIO & CASE STUDIES EDITOR ─── */
-function PortfolioEditor({ portfolio = [], onSave }) {
+function PortfolioEditor({ portfolio = [], onSave, adminToken }) {
   const [list, setList] = useState(portfolio);
   const [editingIndex, setEditingIndex] = useState(null);
 
@@ -1055,6 +1194,7 @@ function PortfolioEditor({ portfolio = [], onSave }) {
                 data={item}
                 onSave={(updated) => handleUpdate(idx, updated)}
                 onCancel={() => setEditingIndex(null)}
+                adminToken={adminToken}
               />
             ) : (
               <div className="flex flex-col sm:flex-row items-start justify-between gap-4">
@@ -1095,7 +1235,7 @@ function PortfolioEditor({ portfolio = [], onSave }) {
   );
 }
 
-function PortfolioForm({ data, onSave, onCancel }) {
+function PortfolioForm({ data, onSave, onCancel, adminToken }) {
   const [formData, setFormData] = useState(data);
 
   return (
@@ -1152,6 +1292,14 @@ function PortfolioForm({ data, onSave, onCancel }) {
         />
       </div>
 
+      <ImageUploadField
+        label="Project Screenshot / Preview Image"
+        value={Array.isArray(formData.images) && formData.images.length > 0 ? formData.images[0] : (typeof formData.images === 'string' ? formData.images : '')}
+        onChange={(url) => setFormData({ ...formData, images: [url] })}
+        adminToken={adminToken}
+        folder="portfolio"
+      />
+
       <div className="flex items-center justify-end gap-2 pt-2">
         <button
           type="button"
@@ -1173,7 +1321,7 @@ function PortfolioForm({ data, onSave, onCancel }) {
 }
 
 /* ─── 6. BLOG & INSIGHTS EDITOR ─── */
-function BlogEditor({ blog = [], onSave }) {
+function BlogEditor({ blog = [], onSave, adminToken }) {
   const [list, setList] = useState(blog);
   const [editingIndex, setEditingIndex] = useState(null);
 
@@ -1244,6 +1392,7 @@ function BlogEditor({ blog = [], onSave }) {
                 data={post}
                 onSave={(updated) => handleUpdate(idx, updated)}
                 onCancel={() => setEditingIndex(null)}
+                adminToken={adminToken}
               />
             ) : (
               <div className="flex flex-col sm:flex-row items-start justify-between gap-4">
@@ -1284,7 +1433,7 @@ function BlogEditor({ blog = [], onSave }) {
   );
 }
 
-function BlogForm({ data, onSave, onCancel }) {
+function BlogForm({ data, onSave, onCancel, adminToken }) {
   const [formData, setFormData] = useState({
     ...data,
     coverImage: data.coverImage || data.image || '',
@@ -1354,15 +1503,13 @@ function BlogForm({ data, onSave, onCancel }) {
         />
       </div>
 
-      <div className="space-y-1">
-        <label className="text-[11px] font-semibold text-slate-700">Cover Image URL</label>
-        <input
-          type="text"
-          value={formData.coverImage || ''}
-          onChange={(e) => setFormData({ ...formData, coverImage: e.target.value })}
-          className="w-full px-3 py-1.5 rounded-lg border border-slate-300 text-slate-900 text-xs focus:border-blue-600"
-        />
-      </div>
+      <ImageUploadField
+        label="Article Cover Image"
+        value={formData.coverImage || ''}
+        onChange={(url) => setFormData({ ...formData, coverImage: url })}
+        adminToken={adminToken}
+        folder="blog"
+      />
 
       <div className="space-y-1">
         <label className="text-[11px] font-semibold text-slate-700">Full Article Content</label>

@@ -3,8 +3,12 @@
  * Connects the React frontend with the Laravel REST API backend.
  */
 
-const isProduction = typeof window !== 'undefined' && window.location.hostname.includes('sovereign2freshempire.com');
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || (isProduction ? '/api/v1' : 'http://localhost:8000/api/v1');
+const isLocalhost = typeof window !== 'undefined' && (
+  window.location.hostname === 'localhost' ||
+  window.location.hostname === '127.0.0.1' ||
+  window.location.hostname === ''
+);
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || (!isLocalhost ? '/api/v1' : 'http://localhost:8000/api/v1');
 
 
 /**
@@ -170,6 +174,55 @@ export async function fetchAdminSubscribers(token) {
   });
 }
 
+/**
+ * Upload media file (image) from Admin CMS.
+ * Sends multipart/form-data to Laravel API, with automatic local DataURL fallback.
+ */
+export async function uploadMedia(file, token, folder = 'cms') {
+  if (!file) throw new Error('No file provided for upload.');
+
+  try {
+    const formData = new FormData();
+    formData.append('file', file);
+    formData.append('folder', folder);
+
+    const headers = {};
+    if (token && !token.startsWith('local_master_token_')) {
+      headers['Authorization'] = `Bearer ${token}`;
+    }
+
+    const response = await fetch(`${API_BASE_URL}/admin/media/upload`, {
+      method: 'POST',
+      headers,
+      body: formData,
+    });
+
+    if (response.ok) {
+      const result = await response.json();
+      if (result.data?.url) {
+        return result.data.url;
+      }
+    } else if (response.status === 422) {
+      const result = await response.json().catch(() => ({}));
+      const errorMsg = result.message || (result.errors ? Object.values(result.errors).flat().join(', ') : 'Image upload validation failed.');
+      throw new Error(errorMsg);
+    }
+  } catch (err) {
+    if (err.message && !err.message.includes('fetch')) {
+      throw err;
+    }
+    console.warn('[uploadMedia] Remote upload failed or server unreachable, falling back to local reader:', err);
+  }
+
+  // Fallback: convert directly to base64 DataURL
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = () => resolve(reader.result);
+    reader.onerror = (error) => reject(error);
+    reader.readAsDataURL(file);
+  });
+}
+
 export default {
   checkApiHealth,
   submitInquiry,
@@ -179,10 +232,12 @@ export default {
   fetchCmsContent,
   saveCmsSection,
   bulkSaveCms,
+  uploadMedia,
   fetchAdminInquiries,
   updateInquiryStatus,
   fetchAdminConsultations,
   updateConsultationStatus,
   fetchAdminSubscribers,
 };
+
 

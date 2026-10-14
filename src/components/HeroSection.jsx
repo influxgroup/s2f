@@ -276,7 +276,7 @@ export default function HeroSection({ setActiveTab, openDiscoveryModal }) {
               {/* Unique Asymmetrical Silhouette Photo Frame */}
               <div className="relative rounded-[2.5rem] rounded-tr-[5.5rem] rounded-bl-2xl overflow-hidden border border-blue-400/40 bg-slate-950 shadow-[0_25px_60px_-15px_rgba(0,0,0,0.85),0_0_50px_-10px_rgba(37,99,235,0.3)] aspect-square ring-1 ring-white/10 group">
                 <img
-                  src={heroExecutiveLead}
+                  src={hero.image || heroExecutiveLead}
                   alt="Sovereign2Fresh Empire African Enterprise Engineering Team"
                   className="w-full h-full object-cover object-center transition-transform duration-700 group-hover:scale-[1.02]"
                 />

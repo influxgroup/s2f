@@ -23,11 +23,15 @@ DirectoryIndex dist/index.html index.html index.php
   RewriteCond %{REQUEST_URI} ^/api/
   RewriteRule ^api/(.*)$ backend/public/index.php [L,QSA]
 
-  # 5. Exclude backend directory from SPA rewrites
+  # 5. Map public uploaded media storage (/storage/...) directly to backend/public/storage/
+  RewriteCond %{REQUEST_URI} ^/storage/
+  RewriteRule ^storage/(.*)$ backend/public/storage/$1 [L,QSA]
+
+  # 6. Exclude backend directory from SPA rewrites
   RewriteCond %{REQUEST_URI} ^/backend/
   RewriteRule ^ - [L]
 
-  # 6. SPA fallback: Route all other requests (deep links / routes) to dist/index.html
+  # 7. SPA fallback: Route all other requests (deep links / routes) to dist/index.html
   RewriteCond %{REQUEST_FILENAME} !-f
   RewriteCond %{REQUEST_FILENAME} !-d
   RewriteCond %{REQUEST_URI} !^/dist/
