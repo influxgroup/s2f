@@ -181,12 +181,22 @@ export async function fetchAdminSubscribers(token) {
 export async function uploadMedia(file, token, folder = 'cms') {
   if (!file) throw new Error('No file provided for upload.');
 
+  // Helper to convert file to base64 DataURL
+  const readFileAsDataUrl = () => new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = () => resolve(reader.result);
+    reader.onerror = (error) => reject(error);
+    reader.readAsDataURL(file);
+  });
+
   try {
     const formData = new FormData();
     formData.append('file', file);
     formData.append('folder', folder);
 
-    const headers = {};
+    const headers = {
+      'Accept': 'application/json',
+    };
     if (token && !token.startsWith('local_master_token_')) {
       headers['Authorization'] = `Bearer ${token}`;
     }
@@ -197,30 +207,32 @@ export async function uploadMedia(file, token, folder = 'cms') {
       body: formData,
     });
 
-    if (response.ok) {
-      const result = await response.json();
-      if (result.data?.url) {
-        return result.data.url;
-      }
-    } else if (response.status === 422) {
-      const result = await response.json().catch(() => ({}));
-      const errorMsg = result.message || (result.errors ? Object.values(result.errors).flat().join(', ') : 'Image upload validation failed.');
-      throw new Error(errorMsg);
+    const responseText = await response.text();
+    let result = null;
+    try {
+      result = JSON.parse(responseText);
+    } catch (parseErr) {
+      console.warn('[uploadMedia] Server returned non-JSON response, using base64 fallback:', responseText.slice(0, 120));
+      return await readFileAsDataUrl();
     }
-  } catch (err) {
-    if (err.message && !err.message.includes('fetch')) {
-      throw err;
-    }
-    console.warn('[uploadMedia] Remote upload failed or server unreachable, falling back to local reader:', err);
-  }
 
-  // Fallback: convert directly to base64 DataURL
-  return new Promise((resolve, reject) => {
-    const reader = new FileReader();
-    reader.onload = () => resolve(reader.result);
-    reader.onerror = (error) => reject(error);
-    reader.readAsDataURL(file);
-  });
+    if (response.ok && result?.data?.url) {
+      return result.data.url;
+    }
+
+    if (response.status === 422) {
+      const errorMsg = result?.message || (result?.errors ? Object.values(result.errors).flat().join(', ') : 'File validation failed.');
+      console.warn('[uploadMedia] Validation failed, falling back to local base64:', errorMsg);
+      return await readFileAsDataUrl();
+    }
+
+    // Any other response code (500, 403, 404): fall back to Data URL
+    console.warn(`[uploadMedia] Server returned status ${response.status}, falling back to base64 DataURL`);
+    return await readFileAsDataUrl();
+  } catch (err) {
+    console.warn('[uploadMedia] Network or server error, falling back to local base64 DataURL:', err.message);
+    return await readFileAsDataUrl();
+  }
 }
 
 export default {
