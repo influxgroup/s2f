@@ -51,10 +51,10 @@ export const mockJobSignals = [
     id: "SIG-904",
     company: "PayEdge Global",
     market: "United States (San Francisco, CA)",
-    targetRole: "Dedicated Engineering Squad (3 Devs + QA)",
+    targetRole: "Senior Enterprise Full-Stack Team",
     openDays: 15,
-    salaryBudget: "$25,000 / month retainer",
-    signalStrength: "Squad Inquiry Received",
+    salaryBudget: "Enterprise SOW Scope",
+    signalStrength: "Enterprise Inquiry Received",
     techStack: ["React", "Node.js", "PostgreSQL", "AWS"],
     contactName: "Elena Rostova",
     contactTitle: "Director of Product Engineering",
@@ -65,23 +65,23 @@ export const mockJobSignals = [
   }
 ];
 
-export const outreachTemplate = `Subject: Scalable Vetted Engineering Squad for {Company Name} / {Job Role}
+export const outreachTemplate = `Subject: Enterprise Software & IT Solutions for {Company Name} / {Job Role}
 
 Hi {Contact Name},
 
-I noticed {Company Name} is currently expanding your engineering team and hiring for a {Job Role}. In the current market, sourcing senior technical talent with verified delivery capabilities can slow down key product roadmap milestones.
+I noticed {Company Name} is currently expanding your technical initiatives and hiring for a {Job Role}. In the current market, sourcing senior technical engineers with verified delivery capabilities can slow down key product roadmap milestones.
 
-Sovereign2Fresh Empire provides a high-trust, managed alternative: a private network of elite, verified software engineers and dedicated technical squads. We handle the entire vetting pipeline, technical management overhead, and delivery QA—allowing you to scale your engineering output without friction.
+Sovereign2Fresh Empire delivers world-class enterprise IT solutions, bespoke software development, commercial drone surveying, and mission-critical cybersecurity. We take full ownership of architecture, quality assurance, and project execution—allowing your organization to scale with certainty.
 
-Key Sovereign2Fresh Empire Guarantees:
-• Top 3% Vetted Talent (Code Architecture, DSA, Soft Skills & Security audited)
-• 48-Hour Talent Replacement SLA
-• Dual-Layer NDAs & 100% Client IP Ownership
-• Full Timezone Overlap with EST / PST / GMT
+Key Sovereign2Fresh Empire Standards:
+• Senior Architecture & Engineering Leadership
+• Rapid 48-Hour Technical Kickoff
+• 100% Client IP Ownership & Dual-Binding NDAs
+• High-Availability Cloud & Cyber Defense Hardening
 
-Would you be open to a brief 10-minute introductory call this week to see how our "Verified" model can support your immediate team capacity?
+Would you be open to a brief 10-minute introductory call this week to see how our engineering team can support your roadmap?
 
 Best regards,
 {Your Name}
-Sovereign2Fresh Empire | Elite. Verified. Secure.
+Sovereign2Fresh Empire | Enterprise IT Solutions
 sovereign2freshempire.com`;

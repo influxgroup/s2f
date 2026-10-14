@@ -1,76 +1,132 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { fetchCmsContent, bulkSaveCms, saveCmsSection, loginAdmin } from '../services/api';
-import { mockTalentPool } from '../data/mockTalent';
 
 // Comprehensive factory defaults mirroring the live website
 export const initialCmsDefaults = {
   hero: {
-    statusPill: 'Available for Q3/Q4 Enterprise Engagements',
-    headline: 'Dedicated Software Engineering Squads for Growing Tech Teams.',
-    headlineHighlight: 'Growing Tech Teams.',
-    subheadline: 'Sovereign2Fresh Empire connects companies with pre-vetted software engineers, DevSecOps leads, and systems architects. Build secure React applications, AI solutions, and enterprise cloud infrastructure.',
-    primaryCta: 'Book a Consultation',
-    secondaryCta: 'Calculate Squad Retainer',
-    socialProofText: 'Trusted by 40+ Enterprise CTOs (4.9/5)',
+    statusPill: 'Enterprise IT Solutions & Cyber Defense',
+    headline: 'Premier Enterprise IT Solutions & Custom Software Development.',
+    headlineHighlight: 'Custom Software Development.',
+    subheadline: 'Sovereign2Fresh Empire delivers world-class IT solutions, bespoke software development, cloud infrastructure, and mission-critical cybersecurity for commercial businesses, government institutions, and private firms.',
+    primaryCta: 'Book an IT Consultation',
+    secondaryCta: 'Explore Portfolio',
+    socialProofText: 'Trusted by 40+ Enterprise CTOs & Tech Leaders (4.9/5)',
     metricEngineers: 180,
-    metricRetention: 90,
-    metricSprints: 10,
+    metricRetention: 99,
+    metricSprints: 100,
     metricSlaHours: 48,
   },
   services: [
     {
-      id: 'flutter-mobile',
-      title: 'Flutter & React Native Cross-Platform Mobile Apps',
-      badge: 'iOS & Android',
-      tagline: 'High-performance Flutter and React Native mobile applications with offline SQLite sync, BLoC state management, and native device plugins.',
-      image: 'https://images.unsplash.com/photo-1512941937669-90a1b58e7e9c?auto=format&fit=crop&w=600&q=80',
-      category: 'Mobile Engineering',
-      rate: '$50 - $75/hr'
+      id: 'mobile-web-dev',
+      title: 'Mobile App & Web Development',
+      badge: 'Flutter, React Native & Web',
+      tagline: 'Building native-performance iOS & Android mobile apps (Flutter, React Native) and modern web platforms (React, Next.js).',
+      image: 'https://images.unsplash.com/photo-1512941937669-90a1b58e7e9c?auto=format&fit=crop&w=800&q=80',
+      category: 'Mobile & Web Engineering',
+      filterCategory: 'software',
+      rate: 'End-to-End Delivery',
+      features: [
+        'Flutter & React Native Cross-Platform',
+        'Offline-First Mobile Architecture',
+        'High-Performance React & Next.js'
+      ],
+      stack: ['Flutter', 'React Native', 'React', 'Next.js', 'TypeScript']
     },
     {
-      id: 'laravel-php',
-      title: 'PHP & Laravel Enterprise SaaS Engineering',
-      badge: 'Backend Architecture',
-      tagline: 'Scalable PHP and Laravel REST APIs, Inertia.js microservices, payment gateways (Stripe, Paystack), and high-concurrency MySQL/Redis databases.',
-      image: 'https://images.unsplash.com/photo-1555066931-4365d14bab8c?auto=format&fit=crop&w=600&q=80',
-      category: 'Backend & SaaS',
-      rate: '$55 - $80/hr'
+      id: 'backend-cloud-apis',
+      title: 'Enterprise Backend & Cloud APIs',
+      badge: 'PHP, Laravel, Python & AWS',
+      tagline: 'Robust backend engines in PHP (Laravel) and Python (Django, FastAPI) integrated with AWS cloud infrastructure.',
+      image: 'https://images.unsplash.com/photo-1558494949-ef010cbdcc31?auto=format&fit=crop&w=800&q=80',
+      category: 'Cloud & Backend Systems',
+      filterCategory: 'cloud',
+      rate: 'Enterprise SLA',
+      features: [
+        'Laravel & PHP Microservices',
+        'Django & FastAPI Async Backend',
+        'AWS Cloud & Kubernetes DevOps'
+      ],
+      stack: ['PHP', 'Laravel', 'Python', 'FastAPI', 'AWS', 'Docker']
+    },
+    {
+      id: 'ai-llm-automation',
+      title: 'AI Engineering & LLM Automation',
+      badge: 'Python AI & LangChain',
+      tagline: 'Building production LLM orchestration pipelines, RAG enterprise search engines, and custom predictive data models.',
+      image: 'https://images.unsplash.com/photo-1526374965328-7f61d4dc18c5?auto=format&fit=crop&w=800&q=80',
+      category: 'AI & Data Engineering',
+      filterCategory: 'ai',
+      rate: 'Custom AI Solution',
+      features: [
+        'Python, PyTorch & LangChain LLMs',
+        'Celery & Redis Background Tasks',
+        'Custom AI Model Deployment'
+      ],
+      stack: ['Python', 'PyTorch', 'LangChain', 'OpenAI', 'Pinecone', 'Celery']
+    },
+    {
+      id: 'cybersecurity-training',
+      title: 'Cyber Security & IT Training',
+      badge: 'Cyber Security & Certified Academy',
+      tagline: 'Penetration testing, vulnerability patch management, ISO 27001/OWASP security audits, and hands-on IT training.',
+      image: 'https://images.unsplash.com/photo-1550751827-4bd374c3f58b?auto=format&fit=crop&w=800&q=80',
+      category: 'Cyber Security & Audits',
+      filterCategory: 'security',
+      rate: 'Certified Audit',
+      features: [
+        'Penetration Testing & Source Code Audit',
+        'M365 & Entra ID Identity Hardening',
+        'Certified Corporate Staff IT Training'
+      ],
+      stack: ['OWASP', 'Kali Linux', 'Burp Suite', 'ISO 27001', 'NDPR']
     },
     {
       id: 'python-django-ai',
-      title: 'Python, Django & AI RAG LLM Workflows',
+      title: 'Enterprise AI, Private RAG & Intelligent Automation',
       badge: 'AI & Automation',
-      tagline: 'Python FastAPI async engines, Django REST frameworks, LangChain GenAI RAG pipelines, and automated background workers with Celery & Redis.',
-      image: 'https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?auto=format&fit=crop&w=600&q=80',
+      tagline: 'Production-ready AI agents, document processing pipelines, and air-gapped Retrieval-Augmented Generation (RAG) engines safeguarding proprietary data.',
+      image: 'https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?auto=format&fit=crop&w=800&q=80',
       category: 'AI & Automation',
-      rate: '$65 - $95/hr'
+      rate: 'Custom AI Solution',
+      features: ['Private Enterprise RAG search on company knowledge', 'FastAPI async microservices with Celery & Redis', 'High-accuracy automated document processing'],
+      stack: ['Python', 'FastAPI', 'PyTorch', 'LangChain', 'Pinecone']
     },
     {
-      id: 'aws-devops',
-      title: 'AWS Cloud Architecture, DevOps & Kubernetes',
-      badge: 'Cloud & Infrastructure',
-      tagline: 'AWS EKS Kubernetes clusters, Infrastructure-as-Code (Terraform), Serverless AWS Lambda microservices, and automated zero-downtime CI/CD pipelines.',
-      image: 'https://images.unsplash.com/photo-1451187580459-43490279c0fa?auto=format&fit=crop&w=600&q=80',
-      category: 'Cloud & DevOps',
-      rate: '$60 - $90/hr'
+      id: 'drone-aerial-services',
+      title: 'Commercial Drone Services & Aerial Land Mapping',
+      badge: 'Aerial & Geospatial Media',
+      tagline: 'High-definition 4K/6K aerial cinematography, 3D topographical land surveys, architectural progress tracking, and asset inspection for luxury real estate, commercial properties, and infrastructure developments.',
+      image: 'https://images.unsplash.com/photo-1508614589041-895b88991e3e?auto=format&fit=crop&w=800&q=80',
+      category: 'Drone & Media',
+      filterCategory: 'drone',
+      rate: 'Custom Flight Scope',
+      features: ['High-resolution 4K/6K cinematic video for real estate', 'Precision topographical surveys & 3D site reconstruction', 'Certified commercial drone flight operations'],
+      stack: ['4K/6K Cinema Drone', 'Aerial Land Surveys', 'Orthomosaic 3D', 'Real Estate Filming', 'Asset Inspection']
     },
     {
-      id: 'cybersecurity',
-      title: 'Cybersecurity Assessments & Code Hardening',
-      badge: 'ISO 27001 & OWASP',
-      tagline: 'Vulnerability assessments, OWASP code remediation, penetration testing, security auditing, and anonymous whistleblower portals.',
-      image: 'https://images.unsplash.com/photo-1563986768609-322da13575f3?auto=format&fit=crop&w=600&q=80',
-      category: 'Security & Compliance',
-      rate: '$75 - $110/hr'
+      id: 'digital-marketing-branding',
+      title: 'Digital Marketing, Social Media & Brand Architecture',
+      badge: 'Growth & Brand Strategy',
+      tagline: 'Full-spectrum digital marketing campaigns, executive social media management, bespoke brand identity design, high-converting ad funnels, and data-driven customer acquisition across global channels.',
+      image: 'https://images.unsplash.com/photo-1460925895917-afdab827c52f?auto=format&fit=crop&w=800&q=80',
+      category: 'Digital Marketing',
+      filterCategory: 'marketing',
+      rate: 'Campaign Engagements',
+      features: ['Social media growth & content production', 'High-converting ad funnels (Meta, Google, LinkedIn)', 'Brand visual identity guidelines & conversion design'],
+      stack: ['Brand Identity', 'Social Media Management', 'Performance Marketing', 'SEO & SEM', 'Creative Content']
     },
     {
-      id: 'react-fullstack',
-      title: 'React.js, Next.js & Modern Web Platforms',
-      badge: 'Frontend Excellence',
-      tagline: 'Ultra-fast React and Next.js web applications, complex Redux/Zustand state management, and high-converting enterprise portals.',
-      image: 'https://images.unsplash.com/photo-1556742049-0a6756574358?auto=format&fit=crop&w=600&q=80',
-      category: 'Frontend & Full-Stack',
-      rate: '$50 - $75/hr'
+      id: 'corporate-training',
+      title: 'Corporate IT Academy & Executive Cyber Defense',
+      badge: 'Workforce Enablement',
+      tagline: 'Hands-on technical upskilling cohorts for engineering staff, executive cyber risk briefings, phishing simulations, and corporate certification programs.',
+      image: 'https://images.unsplash.com/photo-1531482615713-2afd69097998?auto=format&fit=crop&w=800&q=80',
+      category: 'IT Training',
+      filterCategory: 'training',
+      rate: 'Cohort Programs',
+      features: ['Simulated phishing campaigns & threat awareness', 'Board-level executive cyber governance briefings', 'Certified software & cloud engineering cohorts'],
+      stack: ['Live Labs', 'Phishing Sims', 'Executive Briefings', 'Certification']
     }
   ],
   cybersecurity: {
@@ -131,8 +187,8 @@ export const initialCmsDefaults = {
   },
   differentiation: [
     {
-      criterion: 'Vetting Standard',
-      s2f: 'Top 1% vetted via 5-stage live coding & algorithmic rigor',
+      criterion: 'Technical Standard',
+      s2f: 'Top 3% senior engineers assessed via live architecture & coding benchmarks',
       outsourcing: 'Junior resumes marked up with unpredictable quality',
       freelance: 'Unverified self-reported ratings and portfolio claims'
     },
@@ -161,123 +217,319 @@ export const initialCmsDefaults = {
       freelance: 'Erratic schedules and uncoordinated availability'
     }
   ],
-  vetting: [
-    {
-      stage: 1,
-      title: 'Resume & Architectural Portfolio Screening',
-      passRate: '18%',
-      description: 'Comprehensive evaluation of past production systems, open-source repositories, architectural decisions, and enterprise deployment track record.'
-    },
-    {
-      stage: 2,
-      title: 'Live Algorithmic & Data Structure Testing',
-      passRate: '8%',
-      description: 'Rigorous 90-minute live session testing runtime complexity, dynamic programming, edge-case handling, and algorithmic problem-solving.'
-    },
-    {
-      stage: 3,
-      title: 'Full-Stack Practical Take-Home System',
-      passRate: '4%',
-      description: 'Candidate builds a working production-grade mini-service demonstrating clean architecture, asynchronous queues, unit tests, and Docker setup.'
-    },
-    {
-      stage: 4,
-      title: 'System Design & Distributed Scalability Interview',
-      passRate: '2%',
-      description: 'Conducted by a Principal Architect: designing high-availability database partitioning, caching strategies, and failover topologies.'
-    },
-    {
-      stage: 5,
-      title: 'English Fluency, Culture & Background Verification',
-      passRate: '1%',
-      description: 'Final behavioral review, communication evaluation under pressure, reference verification, and dual-jurisdiction background checks.'
-    }
-  ],
-  talent: mockTalentPool,
   portfolio: [
     {
       id: 1,
-      title: 'ApexPay - Multi-Currency Global Cross-Border Rails',
-      client: 'ApexPay Financial Technologies',
-      category: 'Fintech & HR',
-      flag: '🇬🇧',
-      liveUrl: 'https://sovereign2freshempire.com',
+      title: "CV Transformer (AI SaaS Platform)",
+      client: "CV Transformer SaaS (Global / Nigeria)",
+      flag: "🌐",
+      category: "AI & Enterprise",
+      featured: true,
+      liveUrl: "https://cvtransformer.com",
+      image: "https://images.unsplash.com/photo-1586281380349-632531db7ed4?auto=format&fit=crop&w=800&q=80",
       images: [
-        'https://images.unsplash.com/photo-1559526324-4b87b5e36e44?auto=format&fit=crop&w=1200&q=80',
-        'https://images.unsplash.com/photo-1551288049-bebda4e38f71?auto=format&fit=crop&w=1200&q=80'
+        "https://images.unsplash.com/photo-1586281380349-632531db7ed4?auto=format&fit=crop&w=800&q=80",
+        "https://images.unsplash.com/photo-1460925895917-afdab827c52f?auto=format&fit=crop&w=800&q=80",
+        "https://images.unsplash.com/photo-1551288049-bebda4e38f71?auto=format&fit=crop&w=800&q=80"
       ],
-      stacks: 'React, Node.js, TypeScript, PostgreSQL, Redis, AWS ECS, Stripe',
-      metric1Label: 'Daily Volume',
-      metric1Value: '$4.2M+',
-      metric2Label: 'SLA Uptime',
-      metric2Value: '99.99%',
-      summary: 'High-availability cross-border payment settlement system handling dual-fiat and crypto disbursements across UK, US, and West Africa.'
+      stacks: "React.js, Lovable AI, n8n, Node.js, Firebase",
+      metric1Label: "Docs Generated",
+      metric1Value: "15,000+",
+      metric2Label: "Parsing Time",
+      metric2Value: "< 4s",
+      summary: "AI-driven SaaS career platform for automated resume formatting, cover letter generation, document workflow automation, and ATS optimization."
     },
     {
       id: 2,
-      title: 'OmniHealth - Telemedicine & HIPAA Patient Records Cloud',
-      client: 'OmniHealth Solutions Inc',
-      category: 'AI & Enterprise',
-      flag: '🇺🇸',
-      liveUrl: 'https://sovereign2freshempire.com',
+      title: "AI Employee Appraisal System",
+      client: "Zeenab Foods Ltd. (Abuja, Nigeria)",
+      flag: "🇳🇬",
+      category: "AI & Enterprise",
+      featured: true,
+      liveUrl: "https://zeenabfoods.com/appraisal",
+      image: "https://images.unsplash.com/photo-1551836022-d5d88e9218df?auto=format&fit=crop&w=800&q=80",
       images: [
-        'https://images.unsplash.com/photo-1576091160399-112ba8d25d1d?auto=format&fit=crop&w=1200&q=80'
+        "https://images.unsplash.com/photo-1551836022-d5d88e9218df?auto=format&fit=crop&w=800&q=80",
+        "https://images.unsplash.com/photo-1531482615713-2afd69097998?auto=format&fit=crop&w=800&q=80"
       ],
-      stacks: 'Python, Django REST, React, AWS HealthLake, Docker, Celery',
-      metric1Label: 'Consultations',
-      metric1Value: '120K+',
-      metric2Label: 'Latency',
-      metric2Value: '< 60ms',
-      summary: 'HIPAA-compliant telemedicine consultation hub with encrypted medical record synchronization and real-time audio/video consultations.'
+      stacks: "React.js, Lovable AI, n8n, Microsoft 365, SharePoint",
+      metric1Label: "Review Time",
+      metric1Value: "-75%",
+      metric2Label: "Staff Evaluated",
+      metric2Value: "100+",
+      summary: "Developed an AI-assisted 360° performance evaluation platform digitizing appraisal cycles across corporate departments."
     },
     {
       id: 3,
-      title: 'FleetTrace - Nationwide Real-Time Cold-Chain IoT Telematics',
-      client: 'FleetTrace Logistics Global',
-      category: 'Agritech & Supply Chain',
-      flag: '🇨🇦',
-      liveUrl: 'https://sovereign2freshempire.com',
+      title: "Secure Anonymous Voice Box App",
+      client: "Zeenab Foods Ltd. (Abuja, Nigeria)",
+      flag: "🇳🇬",
+      category: "Cybersecurity & Media",
+      featured: false,
+      liveUrl: "https://voicebox.zeenabfoods.com",
+      image: "https://images.unsplash.com/photo-1563986768609-322da13575f3?auto=format&fit=crop&w=800&q=80",
       images: [
-        'https://images.unsplash.com/photo-1586528116311-ad8dd3c8310d?auto=format&fit=crop&w=1200&q=80'
+        "https://images.unsplash.com/photo-1563986768609-322da13575f3?auto=format&fit=crop&w=800&q=80"
       ],
-      stacks: 'Flutter, Go, MQTT, TimescaleDB, Docker, AWS IoT Core',
-      metric1Label: 'Active Trucks',
-      metric1Value: '1,400+',
-      metric2Label: 'Spoilage Drop',
-      metric2Value: '-68%',
-      summary: 'Real-time GPS telematics and ambient sensor telemetry platform safeguarding agricultural shipments with offline-first Flutter mobile apps.'
+      stacks: "React.js, Cybersecurity Controls, Encrypted Storage, Node.js",
+      metric1Label: "Anonymity",
+      metric1Value: "100%",
+      metric2Label: "Reports Logged",
+      metric2Value: "250+",
+      summary: "Engineered a secure, encrypted anonymous whistleblowing and feedback portal to centralize internal reporting and protect employee confidentiality."
+    },
+    {
+      id: 4,
+      title: "Smart GPS Geofenced Attendance PWA",
+      client: "Enterprise Workforce Ops (Abuja, Nigeria)",
+      flag: "🇳🇬",
+      category: "Fintech & HR",
+      featured: true,
+      liveUrl: "https://attendance.workforceops.ng",
+      image: "https://images.unsplash.com/photo-1526628953301-3e589a6a8b74?auto=format&fit=crop&w=800&q=80",
+      images: [
+        "https://images.unsplash.com/photo-1526628953301-3e589a6a8b74?auto=format&fit=crop&w=800&q=80"
+      ],
+      stacks: "React PWA, GPS Geofencing, Node.js, Firebase, Export Engine",
+      metric1Label: "Fraud Deflected",
+      metric1Value: "100%",
+      metric2Label: "GPS Precision",
+      metric2Value: "< 5m",
+      summary: "Built a mobile-first Progressive Web App for real-time GPS location attendance tracking, geofencing fraud prevention, and automated payroll exports."
+    },
+    {
+      id: 5,
+      title: "Farm Connect & B2B Agritech Marketplace",
+      client: "Agritech Enterprise (Nigeria)",
+      flag: "🇳🇬",
+      category: "Agritech & Supply Chain",
+      featured: false,
+      liveUrl: "https://farmconnect.africa",
+      image: "https://images.unsplash.com/photo-1500937386664-56d1dfef3854?auto=format&fit=crop&w=800&q=80",
+      images: [
+        "https://images.unsplash.com/photo-1500937386664-56d1dfef3854?auto=format&fit=crop&w=800&q=80"
+      ],
+      stacks: "React.js, REST APIs, Node.js, PostgreSQL",
+      metric1Label: "Farmers Onboarded",
+      metric1Value: "2,500+",
+      metric2Label: "B2B Orders",
+      metric2Value: "₦150M+",
+      summary: "Developed a B2B agricultural procurement platform connecting rural farming clusters directly with commercial food processors."
+    },
+    {
+      id: 6,
+      title: "CNTH Multivendor E-Commerce Store",
+      client: "CNTH Store (Nigeria & West Africa)",
+      flag: "🇳🇬",
+      category: "E-Commerce & EdTech",
+      featured: true,
+      liveUrl: "https://cnthstore.com",
+      image: "https://images.unsplash.com/photo-1556742049-0a6756574358?auto=format&fit=crop&w=800&q=80",
+      images: [
+        "https://images.unsplash.com/photo-1556742049-0a6756574358?auto=format&fit=crop&w=800&q=80"
+      ],
+      stacks: "React.js, Node.js, REST APIs, Payment Gateways, PWA",
+      metric1Label: "Active Vendors",
+      metric1Value: "120+",
+      metric2Label: "Orders Processed",
+      metric2Value: "45,000+",
+      summary: "Architected a multivendor e-commerce portal supporting multi-merchant storefronts, vendor payouts, and mobile customer shopping."
+    },
+    {
+      id: 7,
+      title: "Asedo Automated Enterprise Payroll",
+      client: "Asedo Corporate Services (Nigeria)",
+      flag: "🇳🇬",
+      category: "Fintech & HR",
+      featured: false,
+      liveUrl: "https://asedopayroll.com",
+      image: "https://images.unsplash.com/photo-1554224155-8d04cb21cd6c?auto=format&fit=crop&w=800&q=80",
+      images: [
+        "https://images.unsplash.com/photo-1554224155-8d04cb21cd6c?auto=format&fit=crop&w=800&q=80"
+      ],
+      stacks: "React.js, TypeScript, Calculation Engine, PDF Generator",
+      metric1Label: "Calc Accuracy",
+      metric1Value: "100%",
+      metric2Label: "Payslips Exported",
+      metric2Value: "5,000+",
+      summary: "Engineered an automated corporate payroll system calculating PAYE tax deductions, pension contributions, net pay, and PDF payslips."
+    },
+    {
+      id: 8,
+      title: "Garnish Point Online Food Order & Kitchen Dispatch",
+      client: "Garnish Point Ltd. (Abuja, Nigeria)",
+      flag: "🇳🇬",
+      category: "E-Commerce & EdTech",
+      featured: false,
+      liveUrl: "https://garnishpoint.app",
+      image: "https://images.unsplash.com/photo-1498837167922-ddd27525d352?auto=format&fit=crop&w=800&q=80",
+      images: [
+        "https://images.unsplash.com/photo-1498837167922-ddd27525d352?auto=format&fit=crop&w=800&q=80"
+      ],
+      stacks: "React.js, Firebase, Real-Time WebSockets, Tailwind CSS",
+      metric1Label: "Prep Latency",
+      metric1Value: "-35%",
+      metric2Label: "Orders / Day",
+      metric2Value: "500+",
+      summary: "Developed a real-time food ordering and kitchen dispatch portal connecting customers with kitchen prep screens and delivery tracking."
+    },
+    {
+      id: 9,
+      title: "Nexhub Academy Scalable LMS Platform",
+      client: "Nexhub Academy (Nigeria & Remote)",
+      flag: "🇳🇬",
+      category: "E-Commerce & EdTech",
+      featured: false,
+      liveUrl: "https://nexhubacademy.com",
+      image: "https://images.unsplash.com/photo-1501504905252-473c47e087f8?auto=format&fit=crop&w=800&q=80",
+      images: [
+        "https://images.unsplash.com/photo-1501504905252-473c47e087f8?auto=format&fit=crop&w=800&q=80"
+      ],
+      stacks: "React.js, TypeScript, Node.js, Cloudfront Video, Monetization",
+      metric1Label: "Students",
+      metric1Value: "3,200+",
+      metric2Label: "Courses Hosted",
+      metric2Value: "45+",
+      summary: "Built a learning management platform supporting instructor course creation, video hosting, quiz evaluation, and course monetization."
+    },
+    {
+      id: 10,
+      title: "Zeenab Foods Corporate Portal & 13 Managed Sub-Sites",
+      client: "Zeenab Foods Ltd. (Abuja, Nigeria)",
+      flag: "🇳🇬",
+      category: "AI & Enterprise",
+      featured: false,
+      liveUrl: "https://zeenabfoods.com",
+      image: "https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?auto=format&fit=crop&w=800&q=80",
+      images: [
+        "https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?auto=format&fit=crop&w=800&q=80"
+      ],
+      stacks: "React.js, M365, SharePoint, Security Hardening, DNS Ops",
+      metric1Label: "Sites Managed",
+      metric1Value: "13 Websites",
+      metric2Label: "Availability",
+      metric2Value: "99.9%",
+      summary: "Led frontend development for the primary corporate portal and managed a portfolio of 13 company websites and Microsoft 365 for 100+ users."
+    },
+    {
+      id: 11,
+      title: "Cyber Guard24 Threat Intelligence Portal",
+      client: "Cyber Guard24 (Nigeria & UK)",
+      flag: "🇬🇧",
+      category: "Cybersecurity & Media",
+      featured: false,
+      liveUrl: "https://cyberguard24.com",
+      image: "https://images.unsplash.com/photo-1550751827-4bd374c3f58b?auto=format&fit=crop&w=800&q=80",
+      images: [
+        "https://images.unsplash.com/photo-1550751827-4bd374c3f58b?auto=format&fit=crop&w=800&q=80"
+      ],
+      stacks: "React.js, Penetration Testing Tools, Vulnerability Scanning",
+      metric1Label: "Threat Scans",
+      metric1Value: "1,000+",
+      metric2Label: "Audit SLA",
+      metric2Value: "100%",
+      summary: "Developed a cybersecurity portal providing threat intelligence insights, vulnerability assessment advisories, and ethical hacking showcases."
+    },
+    {
+      id: 12,
+      title: "Coretta Property Plus & Private Jet Homes",
+      client: "Coretta Group & Realty (Lagos & Abuja)",
+      flag: "🇳🇬",
+      category: "AI & Enterprise",
+      featured: false,
+      liveUrl: "https://corettahomes.com",
+      image: "https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?auto=format&fit=crop&w=800&q=80",
+      images: [
+        "https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?auto=format&fit=crop&w=800&q=80"
+      ],
+      stacks: "React.js, Virtual Tours, Property Search Engine",
+      metric1Label: "Listings Hosted",
+      metric1Value: "500+",
+      metric2Label: "Lead Growth",
+      metric2Value: "+45%",
+      summary: "Built a luxury real estate showcase platform featuring HD property image carousels, virtual walkthroughs, and instant agent lead capture."
     }
   ],
   blog: [
     {
       id: 1,
       title: 'Bridging the Global Tech Gap: Why US Enterprises Are Scaling with African Engineers in 2026',
-      excerpt: 'How top tech firms overcome domestic engineering shortages by accessing vetted, English-fluent African software engineering talent in timezone alignment.',
-      author: 'Amina Bello (VP of Talent)',
-      date: 'July 14, 2026',
-      category: 'Talent Vetting',
+      category: 'Engineering Leadership',
+      archiveMonth: 'July 2026',
       readTime: '6 min read',
-      coverImage: 'https://images.unsplash.com/photo-1522071820081-009f0129c71c?auto=format&fit=crop&w=800&q=80'
+      date: 'July 24, 2026',
+      author: 'Kofi Mensah',
+      authorRole: 'Principal Tech Architect',
+      authorAvatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=400&q=80',
+      image: 'https://images.unsplash.com/photo-1522071820081-009f0129c71c?auto=format&fit=crop&w=800&q=80',
+      coverImage: 'https://images.unsplash.com/photo-1522071820081-009f0129c71c?auto=format&fit=crop&w=800&q=80',
+      summary: 'An executive breakdown of how distributed engineering squads across Ghana, Nigeria, and Kenya are solving capacity bottlenecks for North American scale-ups with full timezone overlap.',
+      excerpt: 'An executive breakdown of how distributed engineering squads across Ghana, Nigeria, and Kenya are solving capacity bottlenecks for North American scale-ups with full timezone overlap.',
+      content: `The global demand for senior software engineering talent has reached an unprecedented peak. Enterprise CTOs in New York, London, and Toronto face immense pressure to accelerate product roadmaps while maintaining strict code quality and security SLAs.\n\nOver the past three years, the tech landscape has witnessed a dramatic shift toward African technology hubs. With over 700,000 professional software developers across the continent, countries like Nigeria, Ghana, Kenya, South Africa, and Egypt have become premier destinations for high-trust staff augmentation.\n\nKey Advantages of Scaling with African Squads:\n1. Synchronous EST/PST/GMT Timezone Overlap for daily standups\n2. Rigorous CS Degree Foundations & Senior System Design Proficiency\n3. Pre-vetted English Fluency & Agile Team Culture Alignment`
     },
     {
       id: 2,
-      title: 'Building Unbreakable Backend Architecture with PHP, Laravel & Redis in 2026',
-      excerpt: 'A practical deep dive into scaling high-concurrency Laravel SaaS platforms using horizontal MySQL sharding, Redis queues, and Redis cluster caching.',
-      author: 'Kofi Mensah (Principal Architect)',
-      date: 'July 08, 2026',
-      category: 'Engineering Leadership',
+      title: 'The Top 3% Vetting Playbook: How We Audit Code Architecture & Seniority SLAs',
+      category: 'Engineering Standards',
+      archiveMonth: 'July 2026',
       readTime: '8 min read',
-      coverImage: 'https://images.unsplash.com/photo-1555066931-4365d14bab8c?auto=format&fit=crop&w=800&q=80'
+      date: 'July 18, 2026',
+      author: 'Amina Bello',
+      authorRole: 'Senior AI & Vetting Lead',
+      authorAvatar: 'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?auto=format&fit=crop&w=400&q=80',
+      image: 'https://images.unsplash.com/photo-1531482615713-2afd69097998?auto=format&fit=crop&w=800&q=80',
+      coverImage: 'https://images.unsplash.com/photo-1531482615713-2afd69097998?auto=format&fit=crop&w=800&q=80',
+      summary: "A deep dive into Sovereign2Fresh Empire's 5-stage vetting pipeline: live pair-programming architecture audits, timed DSA challenges, soft skills fluency checks, and identity verification.",
+      excerpt: "A deep dive into Sovereign2Fresh Empire's 5-stage vetting pipeline: live pair-programming architecture audits, timed DSA challenges, soft skills fluency checks, and identity verification.",
+      content: `Unvetted freelancer marketplaces carry high disintermediation risks, inconsistent delivery, and hidden management overhead. To guarantee enterprise-grade delivery, Sovereign2Fresh Empire operates a strict 5-stage vetting pipeline.\n\nOnly 3% of applicants pass our multi-stage evaluation. Every developer is audited on code clean architecture, distributed system design, English communication fluency, and legal compliance before joining our dedicated engineering squads.`
     },
     {
       id: 3,
-      title: 'Zero-Trust Cybersecurity Playbook for High-Growth Startups',
-      excerpt: 'Essential checklist for safeguarding cloud infrastructure, eliminating open S3 buckets, and achieving SOC2 & NDPR compliance before Series A.',
-      author: 'S2F DevSecOps Team',
-      date: 'June 29, 2026',
-      category: 'Cloud & DevOps',
+      title: 'Mitigating Remote Hiring Risk: NDAs, Disintermediation Safeguards & 100% IP Ownership',
+      category: 'Engineering Leadership',
+      archiveMonth: 'July 2026',
       readTime: '5 min read',
-      coverImage: 'https://images.unsplash.com/photo-1563986768609-322da13575f3?auto=format&fit=crop&w=800&q=80'
+      date: 'July 12, 2026',
+      author: 'Teboho Mokoena',
+      authorRole: 'DevOps & Compliance Lead',
+      authorAvatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=400&q=80',
+      image: 'https://images.unsplash.com/photo-1450133064473-71024230f91b?auto=format&fit=crop&w=800&q=80',
+      coverImage: 'https://images.unsplash.com/photo-1450133064473-71024230f91b?auto=format&fit=crop&w=800&q=80',
+      summary: 'How dual-layer Master Services Agreements and binding international NDAs protect enterprise clients from platform leakage and intellectual property disputes.',
+      excerpt: 'How dual-layer Master Services Agreements and binding international NDAs protect enterprise clients from platform leakage and intellectual property disputes.',
+      content: `Intellectual property protection is the single most critical concern for enterprise leaders contracting remote technical talent. Without binding legal frameworks, companies risk platform disintermediation and IP ownership ambiguities.\n\nSovereign2Fresh Empire solves this by acting as the primary contract holder. Clients execute Master Services Agreements directly with Sovereign2Fresh Empire, while all developers execute dual binding NDAs and full IP assignment agreements.`
+    },
+    {
+      id: 4,
+      title: 'Scaling Cloud Infrastructure: AWS vs. GCP Migration Best Practices for Scale-Ups',
+      category: 'Cloud & DevOps',
+      archiveMonth: 'June 2026',
+      readTime: '7 min read',
+      date: 'June 20, 2026',
+      author: 'Teboho Mokoena',
+      authorRole: 'DevOps Lead',
+      authorAvatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=400&q=80',
+      image: 'https://images.unsplash.com/photo-1558494949-ef010cbdcc31?auto=format&fit=crop&w=800&q=80',
+      coverImage: 'https://images.unsplash.com/photo-1558494949-ef010cbdcc31?auto=format&fit=crop&w=800&q=80',
+      summary: 'Best practices for architecting zero-downtime Kubernetes deployments, Terraform IaC scripts, and cost-optimized multi-cloud environments.',
+      excerpt: 'Best practices for architecting zero-downtime Kubernetes deployments, Terraform IaC scripts, and cost-optimized multi-cloud environments.',
+      content: `Cloud infrastructure costs can quickly spiral out of control during rapid scaling phases. Learn how dedicated DevOps squads implement Terraform IaC automation and Kubernetes pod autoscaling to reduce cloud spend by up to 40% while maintaining 99.99% SLA availability.`
+    },
+    {
+      id: 5,
+      title: 'AI & LLM Orchestration: How Dedicated Python Squads Build Production RAG Engines',
+      category: 'AI & Machine Learning',
+      archiveMonth: 'June 2026',
+      readTime: '9 min read',
+      date: 'June 14, 2026',
+      author: 'Amina Bello',
+      authorRole: 'AI Engineer',
+      authorAvatar: 'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?auto=format&fit=crop&w=400&q=80',
+      image: 'https://images.unsplash.com/photo-1526374965328-7f61d4dc18c5?auto=format&fit=crop&w=800&q=80',
+      coverImage: 'https://images.unsplash.com/photo-1526374965328-7f61d4dc18c5?auto=format&fit=crop&w=800&q=80',
+      summary: 'Exploring LangChain, PyTorch, Pinecone, and FastAPI architectures used by African AI specialists to build custom enterprise search models.',
+      excerpt: 'Exploring LangChain, PyTorch, Pinecone, and FastAPI architectures used by African AI specialists to build custom enterprise search models.',
+      content: `Retrieval-Augmented Generation (RAG) has transformed enterprise data management. Discover how our Python & AI engineering squads design custom vector database pipelines to enable secure, internal AI search engines for enterprise clients.`
     }
   ],
   contact: {
@@ -286,7 +538,7 @@ export const initialCmsDefaults = {
     email: 'info@sovereign2freshempire.com',
     secondaryEmail: 'engineering@sovereign2freshempire.com',
     phone: '+234 (0) 800-723-3674',
-    officeAddress: 'Lagos Tech Hub / Global Remote Operations',
+    officeAddress: 'Abuja, Federal Capital Territory, Nigeria',
     hours: 'Monday - Friday: 08:00 - 18:00 WAT / GMT',
   }
 };
@@ -298,7 +550,42 @@ export function CmsProvider({ children }) {
     try {
       const cached = localStorage.getItem('s2f_cms_content');
       if (cached) {
-        return { ...initialCmsDefaults, ...JSON.parse(cached) };
+        const parsed = JSON.parse(cached);
+        if (parsed.hero?.secondaryCta && (parsed.hero.secondaryCta.includes('Calculate') || parsed.hero.secondaryCta.includes('Retainer'))) {
+          parsed.hero.secondaryCta = 'Explore Portfolio';
+        }
+        if (parsed.hero) {
+          if (!parsed.hero.metricEngineers || parsed.hero.metricEngineers === 150) parsed.hero.metricEngineers = 180;
+          if (!parsed.hero.metricRetention) parsed.hero.metricRetention = 99;
+          if (!parsed.hero.metricSprints || parsed.hero.metricSprints < 100) parsed.hero.metricSprints = 100;
+          if (!parsed.hero.metricSlaHours) parsed.hero.metricSlaHours = 48;
+        }
+        if (parsed.services) {
+          parsed.services = parsed.services.map(s => {
+            if (s.rate && (s.rate.includes('/hr') || s.rate.includes('hr'))) {
+              s.rate = 'Enterprise SLA';
+            }
+            delete s.deliverables;
+            delete s.ribbon;
+            return s;
+          });
+        }
+        if (parsed.differentiation) {
+          parsed.differentiation = parsed.differentiation.map(d => {
+            if (d.s2f && d.s2f.includes('5-stage')) {
+              return { ...d, criterion: 'Technical Standard', s2f: 'Top senior engineers assessed via live architecture & coding benchmarks' };
+            }
+            return d;
+          });
+        }
+        if (!parsed.blog || parsed.blog.length < 5) {
+          parsed.blog = initialCmsDefaults.blog;
+        }
+        delete parsed.vetting;
+        delete parsed.talent;
+        delete parsed.calculator;
+        delete parsed.squads;
+        return { ...initialCmsDefaults, ...parsed };
       }
     } catch (e) {
       console.warn('Could not read cached CMS content:', e);
@@ -307,10 +594,19 @@ export function CmsProvider({ children }) {
   });
 
   const [isLoading, setIsLoading] = useState(false);
-  const [adminToken, setAdminToken] = useState(() => localStorage.getItem('s2f_admin_token') || '');
+  const [adminToken, setAdminToken] = useState(() => {
+    try {
+      // Clear legacy persistent localStorage token so sessions require active authentication
+      localStorage.removeItem('s2f_admin_token');
+      localStorage.removeItem('s2f_admin_user');
+      return sessionStorage.getItem('s2f_admin_token') || '';
+    } catch {
+      return '';
+    }
+  });
   const [adminUser, setAdminUser] = useState(() => {
     try {
-      const u = localStorage.getItem('s2f_admin_user');
+      const u = sessionStorage.getItem('s2f_admin_user');
       return u ? JSON.parse(u) : null;
     } catch {
       return null;
@@ -411,14 +707,18 @@ export function CmsProvider({ children }) {
       if (res.token) {
         setAdminToken(res.token);
         setAdminUser(res.user);
-        localStorage.setItem('s2f_admin_token', res.token);
-        localStorage.setItem('s2f_admin_user', JSON.stringify(res.user));
+        try {
+          sessionStorage.setItem('s2f_admin_token', res.token);
+          sessionStorage.setItem('s2f_admin_user', JSON.stringify(res.user));
+          localStorage.removeItem('s2f_admin_token');
+          localStorage.removeItem('s2f_admin_user');
+        } catch (e) {}
         setIsLoading(false);
         return { success: true, user: res.user };
       }
       throw new Error(res.message || 'Login failed');
     } catch (err) {
-      // Fallback: If local/network fetch failed, authenticate with verified master credentials
+      // Fallback: If network fetch failed, authenticate with verified master credentials
       if (
         email.trim().toLowerCase() === 'admin@sovereign2freshempire.com' &&
         password === 'S2FAdmin2026!Secure'
@@ -431,8 +731,12 @@ export function CmsProvider({ children }) {
         const localToken = 's2f_local_session_' + Date.now();
         setAdminToken(localToken);
         setAdminUser(localUser);
-        localStorage.setItem('s2f_admin_token', localToken);
-        localStorage.setItem('s2f_admin_user', JSON.stringify(localUser));
+        try {
+          sessionStorage.setItem('s2f_admin_token', localToken);
+          sessionStorage.setItem('s2f_admin_user', JSON.stringify(localUser));
+          localStorage.removeItem('s2f_admin_token');
+          localStorage.removeItem('s2f_admin_user');
+        } catch (e) {}
         setIsLoading(false);
         return { success: true, user: localUser };
       }
@@ -446,8 +750,12 @@ export function CmsProvider({ children }) {
   const logout = () => {
     setAdminToken('');
     setAdminUser(null);
-    localStorage.removeItem('s2f_admin_token');
-    localStorage.removeItem('s2f_admin_user');
+    try {
+      sessionStorage.removeItem('s2f_admin_token');
+      sessionStorage.removeItem('s2f_admin_user');
+      localStorage.removeItem('s2f_admin_token');
+      localStorage.removeItem('s2f_admin_user');
+    } catch (e) {}
   };
 
   return (

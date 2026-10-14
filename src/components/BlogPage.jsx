@@ -1,7 +1,92 @@
 import React, { useState } from 'react';
+import { useCms } from '../context/CmsContext';
 import { Search, BookOpen, Clock, ArrowRight, ArrowLeft, Tag, Sparkles, Send, CheckCircle2, X, Eye, Heart, Rocket, Lightbulb, ThumbsUp, Share2, Link2, MessageSquare, Calendar, Archive, Flame, Globe } from 'lucide-react';
 
+const fallbackArticles = [
+  {
+    id: 1,
+    title: "Bridging the Global Tech Gap: Why US Enterprises Are Scaling with African Engineers in 2026",
+    category: "Engineering Leadership",
+    archiveMonth: "July 2026",
+    readTime: "6 min read",
+    date: "July 24, 2026",
+    author: "Kofi Mensah",
+    authorRole: "Principal Tech Architect",
+    authorAvatar: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=400&q=80",
+    image: "https://images.unsplash.com/photo-1522071820081-009f0129c71c?auto=format&fit=crop&w=800&q=80",
+    coverImage: "https://images.unsplash.com/photo-1522071820081-009f0129c71c?auto=format&fit=crop&w=800&q=80",
+    summary: "An executive breakdown of how distributed engineering squads across Ghana, Nigeria, and Kenya are solving capacity bottlenecks for North American scale-ups with full timezone overlap.",
+    excerpt: "An executive breakdown of how distributed engineering squads across Ghana, Nigeria, and Kenya are solving capacity bottlenecks for North American scale-ups with full timezone overlap.",
+    content: `The global demand for senior software engineering talent has reached an unprecedented peak. Enterprise CTOs in New York, London, and Toronto face immense pressure to accelerate product roadmaps while maintaining strict code quality and security SLAs.\n\nOver the past three years, the tech landscape has witnessed a dramatic shift toward African technology hubs. With over 700,000 professional software developers across the continent, countries like Nigeria, Ghana, Kenya, South Africa, and Egypt have become premier destinations for high-trust staff augmentation.\n\nKey Advantages of Scaling with African Squads:\n1. Synchronous EST/PST/GMT Timezone Overlap for daily standups\n2. Rigorous CS Degree Foundations & Senior System Design Proficiency\n3. Pre-vetted English Fluency & Agile Team Culture Alignment`
+  },
+  {
+    id: 2,
+    title: "The Top 3% Vetting Playbook: How We Audit Code Architecture & Seniority SLAs",
+    category: "Engineering Standards",
+    archiveMonth: "July 2026",
+    readTime: "8 min read",
+    date: "July 18, 2026",
+    author: "Amina Bello",
+    authorRole: "Senior AI & Vetting Lead",
+    authorAvatar: "https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?auto=format&fit=crop&w=400&q=80",
+    image: "https://images.unsplash.com/photo-1531482615713-2afd69097998?auto=format&fit=crop&w=800&q=80",
+    coverImage: "https://images.unsplash.com/photo-1531482615713-2afd69097998?auto=format&fit=crop&w=800&q=80",
+    summary: "A deep dive into Sovereign2Fresh Empire's 5-stage vetting pipeline: live pair-programming architecture audits, timed DSA challenges, soft skills fluency checks, and identity verification.",
+    excerpt: "A deep dive into Sovereign2Fresh Empire's 5-stage vetting pipeline: live pair-programming architecture audits, timed DSA challenges, soft skills fluency checks, and identity verification.",
+    content: `Unvetted freelancer marketplaces carry high disintermediation risks, inconsistent delivery, and hidden management overhead. To guarantee enterprise-grade delivery, Sovereign2Fresh Empire operates a strict 5-stage vetting pipeline.\n\nOnly 3% of applicants pass our multi-stage evaluation. Every developer is audited on code clean architecture, distributed system design, English communication fluency, and legal compliance before joining our dedicated engineering squads.`
+  },
+  {
+    id: 3,
+    title: "Mitigating Remote Hiring Risk: NDAs, Disintermediation Safeguards & 100% IP Ownership",
+    category: "Engineering Leadership",
+    archiveMonth: "July 2026",
+    readTime: "5 min read",
+    date: "July 12, 2026",
+    author: "Teboho Mokoena",
+    authorRole: "DevOps & Compliance Lead",
+    authorAvatar: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=400&q=80",
+    image: "https://images.unsplash.com/photo-1450133064473-71024230f91b?auto=format&fit=crop&w=800&q=80",
+    coverImage: "https://images.unsplash.com/photo-1450133064473-71024230f91b?auto=format&fit=crop&w=800&q=80",
+    summary: "How dual-layer Master Services Agreements and binding international NDAs protect enterprise clients from platform leakage and intellectual property disputes.",
+    excerpt: "How dual-layer Master Services Agreements and binding international NDAs protect enterprise clients from platform leakage and intellectual property disputes.",
+    content: `Intellectual property protection is the single most critical concern for enterprise leaders contracting remote technical talent. Without binding legal frameworks, companies risk platform disintermediation and IP ownership ambiguities.\n\nSovereign2Fresh Empire solves this by acting as the primary contract holder. Clients execute Master Services Agreements directly with Sovereign2Fresh Empire, while all developers execute dual binding NDAs and full IP assignment agreements.`
+  },
+  {
+    id: 4,
+    title: "Scaling Cloud Infrastructure: AWS vs. GCP Migration Best Practices for Scale-Ups",
+    category: "Cloud & DevOps",
+    archiveMonth: "June 2026",
+    readTime: "7 min read",
+    date: "June 20, 2026",
+    author: "Teboho Mokoena",
+    authorRole: "DevOps Lead",
+    authorAvatar: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=400&q=80",
+    image: "https://images.unsplash.com/photo-1558494949-ef010cbdcc31?auto=format&fit=crop&w=800&q=80",
+    coverImage: "https://images.unsplash.com/photo-1558494949-ef010cbdcc31?auto=format&fit=crop&w=800&q=80",
+    summary: "Best practices for architecting zero-downtime Kubernetes deployments, Terraform IaC scripts, and cost-optimized multi-cloud environments.",
+    excerpt: "Best practices for architecting zero-downtime Kubernetes deployments, Terraform IaC scripts, and cost-optimized multi-cloud environments.",
+    content: `Cloud infrastructure costs can quickly spiral out of control during rapid scaling phases. Learn how dedicated DevOps squads implement Terraform IaC automation and Kubernetes pod autoscaling to reduce cloud spend by up to 40% while maintaining 99.99% SLA availability.`
+  },
+  {
+    id: 5,
+    title: "AI & LLM Orchestration: How Dedicated Python Squads Build Production RAG Engines",
+    category: "AI & Machine Learning",
+    archiveMonth: "June 2026",
+    readTime: "9 min read",
+    date: "June 14, 2026",
+    author: "Amina Bello",
+    authorRole: "AI Engineer",
+    authorAvatar: "https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?auto=format&fit=crop&w=400&q=80",
+    image: "https://images.unsplash.com/photo-1526374965328-7f61d4dc18c5?auto=format&fit=crop&w=800&q=80",
+    coverImage: "https://images.unsplash.com/photo-1526374965328-7f61d4dc18c5?auto=format&fit=crop&w=800&q=80",
+    summary: "Exploring LangChain, PyTorch, Pinecone, and FastAPI architectures used by African AI specialists to build custom enterprise search models.",
+    excerpt: "Exploring LangChain, PyTorch, Pinecone, and FastAPI architectures used by African AI specialists to build custom enterprise search models.",
+    content: `Retrieval-Augmented Generation (RAG) has transformed enterprise data management. Discover how our Python & AI engineering squads design custom vector database pipelines to enable secure, internal AI search engines for enterprise clients.`
+  }
+];
+
 export default function BlogPage({ openDiscoveryModal }) {
+  const { content } = useCms();
   const [activeCategory, setActiveCategory] = useState('All');
   const [activeArchive, setActiveArchive] = useState(null);
   const [searchTerm, setSearchTerm] = useState('');
@@ -46,7 +131,7 @@ export default function BlogPage({ openDiscoveryModal }) {
   const [newCommentName, setNewCommentName] = useState('');
   const [newCommentText, setNewCommentText] = useState('');
 
-  const categories = ['All', 'Talent Vetting', 'Engineering Leadership', 'Cloud & DevOps', 'AI & Machine Learning'];
+  const categories = ['All', 'Engineering Standards', 'Engineering Leadership', 'Cloud & DevOps', 'AI & Machine Learning'];
 
   const archives = [
     { label: 'July 2026', count: 4 },
@@ -54,78 +139,16 @@ export default function BlogPage({ openDiscoveryModal }) {
     { label: 'May 2026', count: 2 }
   ];
 
-  const articles = [
-    {
-      id: 1,
-      title: "Bridging the Global Tech Gap: Why US Enterprises Are Scaling with African Engineers in 2026",
-      category: "Engineering Leadership",
-      archiveMonth: "July 2026",
-      readTime: "6 min read",
-      date: "July 24, 2026",
-      author: "Kofi Mensah",
-      authorRole: "Principal Tech Architect",
-      authorAvatar: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=400&q=80",
-      image: "https://images.unsplash.com/photo-1522071820081-009f0129c71c?auto=format&fit=crop&w=800&q=80",
-      summary: "An executive breakdown of how distributed engineering squads across Ghana, Nigeria, and Kenya are solving capacity bottlenecks for North American scale-ups with full timezone overlap.",
-      content: `The global demand for senior software engineering talent has reached an unprecedented peak. Enterprise CTOs in New York, London, and Toronto face immense pressure to accelerate product roadmaps while maintaining strict code quality and security SLAs.\n\nOver the past three years, the tech landscape has witnessed a dramatic shift toward African technology hubs. With over 700,000 professional software developers across the continent, countries like Nigeria, Ghana, Kenya, South Africa, and Egypt have become premier destinations for high-trust staff augmentation.\n\nKey Advantages of Scaling with African Squads:\n1. Synchronous EST/PST/GMT Timezone Overlap for daily standups\n2. Rigorous CS Degree Foundations & Senior System Design Proficiency\n3. Pre-vetted English Fluency & Agile Team Culture Alignment`
-    },
-    {
-      id: 2,
-      title: "The Top 3% Vetting Playbook: How We Audit Code Architecture & Seniority SLAs",
-      category: "Talent Vetting",
-      archiveMonth: "July 2026",
-      readTime: "8 min read",
-      date: "July 18, 2026",
-      author: "Amina Bello",
-      authorRole: "Senior AI & Vetting Lead",
-      authorAvatar: "https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?auto=format&fit=crop&w=400&q=80",
-      image: "https://images.unsplash.com/photo-1531482615713-2afd69097998?auto=format&fit=crop&w=800&q=80",
-      summary: "A deep dive into Sovereign2Fresh Empire's 5-stage vetting pipeline: live pair-programming architecture audits, timed DSA challenges, soft skills fluency checks, and identity verification.",
-      content: `Unvetted freelancer marketplaces carry high disintermediation risks, inconsistent delivery, and hidden management overhead. To guarantee enterprise-grade delivery, Sovereign2Fresh Empire operates a strict 5-stage vetting pipeline.\n\nOnly 3% of applicants pass our multi-stage evaluation. Every developer is audited on code clean architecture, distributed system design, English communication fluency, and legal compliance before entering our talent registry.`
-    },
-    {
-      id: 3,
-      title: "Mitigating Remote Hiring Risk: NDAs, Disintermediation Safeguards & 100% IP Ownership",
-      category: "Engineering Leadership",
-      archiveMonth: "July 2026",
-      readTime: "5 min read",
-      date: "July 12, 2026",
-      author: "Teboho Mokoena",
-      authorRole: "DevOps & Compliance Lead",
-      authorAvatar: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=400&q=80",
-      image: "https://images.unsplash.com/photo-1450133064473-71024230f91b?auto=format&fit=crop&w=800&q=80",
-      summary: "How dual-layer Master Services Agreements and binding international NDAs protect enterprise clients from platform leakage and intellectual property disputes.",
-      content: `Intellectual property protection is the single most critical concern for enterprise leaders contracting remote technical talent. Without binding legal frameworks, companies risk platform disintermediation and IP ownership ambiguities.\n\nSovereign2Fresh Empire solves this by acting as the primary contract holder. Clients execute Master Services Agreements directly with Sovereign2Fresh Empire, while all developers execute dual binding NDAs and full IP assignment agreements.`
-    },
-    {
-      id: 4,
-      title: "Scaling Cloud Infrastructure: AWS vs. GCP Migration Best Practices for Scale-Ups",
-      category: "Cloud & DevOps",
-      archiveMonth: "June 2026",
-      readTime: "7 min read",
-      date: "June 20, 2026",
-      author: "Teboho Mokoena",
-      authorRole: "DevOps Lead",
-      authorAvatar: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=400&q=80",
-      image: "https://images.unsplash.com/photo-1558494949-ef010cbdcc31?auto=format&fit=crop&w=800&q=80",
-      summary: "Best practices for architecting zero-downtime Kubernetes deployments, Terraform IaC scripts, and cost-optimized multi-cloud environments.",
-      content: `Cloud infrastructure costs can quickly spiral out of control during rapid scaling phases. Learn how dedicated DevOps squads implement Terraform IaC automation and Kubernetes pod autoscaling to reduce cloud spend by up to 40% while maintaining 99.99% SLA availability.`
-    },
-    {
-      id: 5,
-      title: "AI & LLM Orchestration: How Dedicated Python Squads Build Production RAG Engines",
-      category: "AI & Machine Learning",
-      archiveMonth: "June 2026",
-      readTime: "9 min read",
-      date: "June 14, 2026",
-      author: "Amina Bello",
-      authorRole: "AI Engineer",
-      authorAvatar: "https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?auto=format&fit=crop&w=400&q=80",
-      image: "https://images.unsplash.com/photo-1526374965328-7f61d4dc18c5?auto=format&fit=crop&w=800&q=80",
-      summary: "Exploring LangChain, PyTorch, Pinecone, and FastAPI architectures used by African AI specialists to build custom enterprise search models.",
-      content: `Retrieval-Augmented Generation (RAG) has transformed enterprise data management. Discover how our Python & AI engineering squads design custom vector database pipelines to enable secure, internal AI search engines for enterprise clients.`
-    }
-  ];
+  const rawArticles = (content?.blog && content.blog.length > 0) ? content.blog : fallbackArticles;
+  const articles = rawArticles.map(art => ({
+    ...art,
+    image: art.image || art.coverImage || 'https://images.unsplash.com/photo-1522071820081-009f0129c71c?auto=format&fit=crop&w=800&q=80',
+    coverImage: art.coverImage || art.image || 'https://images.unsplash.com/photo-1522071820081-009f0129c71c?auto=format&fit=crop&w=800&q=80',
+    summary: art.summary || art.excerpt || '',
+    excerpt: art.excerpt || art.summary || '',
+    authorAvatar: art.authorAvatar || 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=400&q=80',
+    content: art.content || art.summary || art.excerpt || '',
+  }));
 
   // Increment reaction
   const handleReaction = (artId, type) => {
@@ -267,7 +290,7 @@ export default function BlogPage({ openDiscoveryModal }) {
 
           {/* Main Article Content */}
           <div className="bg-white p-6 sm:p-10 rounded-3xl border border-slate-200/80 shadow-sm space-y-6 text-base text-slate-700 leading-relaxed font-normal">
-            {selectedArticle.content.split('\n\n').map((paragraph, pIdx) => (
+            {(selectedArticle.content || selectedArticle.summary || selectedArticle.excerpt || '').split('\n\n').map((paragraph, pIdx) => (
               <p key={pIdx} className="first-letter:text-3xl first-letter:font-extrabold first-letter:text-[#0f1d31] first-letter:mr-1">
                 {paragraph}
               </p>
@@ -323,7 +346,7 @@ export default function BlogPage({ openDiscoveryModal }) {
               <span className="text-[10px] font-extrabold uppercase tracking-widest text-blue-400">Article Author</span>
               <h4 className="text-xl font-extrabold text-white font-heading">{selectedArticle.author}</h4>
               <p className="text-xs text-blue-200 font-semibold">{selectedArticle.authorRole} at Sovereign2Fresh Empire</p>
-              <p className="text-xs text-slate-300 mt-1">Leading technical architecture, distributed system audits, and senior talent verification across North America and Europe.</p>
+              <p className="text-xs text-slate-300 mt-1">Leading technical architecture, distributed system audits, and senior engineering verification across North America and Europe.</p>
             </div>
             <button
               onClick={openDiscoveryModal}
@@ -482,15 +505,11 @@ export default function BlogPage({ openDiscoveryModal }) {
         
         {/* Section Header */}
         <div className="text-center space-y-3 max-w-3xl mx-auto">
-          <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-blue-900/10 border border-blue-500/20 text-[#2563eb] text-xs font-extrabold uppercase tracking-wider">
-            <BookOpen className="w-3.5 h-3.5 text-[#2563eb]" />
-            <span>Engineering Thought Leadership</span>
-          </div>
-          <h2 className="text-3xl sm:text-4xl font-extrabold text-[#0f1d31] tracking-tight font-heading">
+          <h1 className="text-3xl sm:text-4xl font-extrabold text-[#0f1d31] tracking-tight font-heading">
             Sovereign2Fresh Empire Insights & <span className="text-[#1d4ed8]">Publications.</span>
-          </h2>
+          </h1>
           <p className="text-slate-600 text-xs sm:text-sm leading-relaxed">
-            Strategic guides, talent vetting playbooks, and cloud architecture case studies written by senior African tech architects.
+            Strategic guides, engineering vetting playbooks, and cloud architecture case studies written by senior African tech architects.
           </p>
         </div>
 
@@ -727,7 +746,7 @@ export default function BlogPage({ openDiscoveryModal }) {
               </div>
 
               <div className="flex flex-wrap gap-1.5">
-                {['Talent Vetting', 'Engineering SLAs', 'Dual NDAs', 'DevOps & AWS', 'Python RAG', 'React Squads', 'Timezone Overlap'].map((topic) => (
+                {['Engineering Standards', 'Engineering SLAs', 'Dual NDAs', 'DevOps & AWS', 'Python RAG', 'React Squads', 'Timezone Overlap'].map((topic) => (
                   <span
                     key={topic}
                     onClick={() => {

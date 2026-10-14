@@ -6,6 +6,7 @@ import {
   User, 
   Mail, 
   Phone, 
+  MapPin,
   Lock, 
   Globe, 
   ArrowRight,
@@ -20,9 +21,9 @@ export default function ContactPage({ setActiveTab }) {
     fullName: '',
     workEmail: '',
     phoneNumber: '',
-    serviceArea: 'Dedicated Software Engineering Squads',
+    serviceArea: 'Enterprise IT Solutions & Custom Software',
     primaryStack: 'Full Stack (React / Node.js / AWS)',
-    squadSize: 'Medium Managed Squad (4-6 Engineers)',
+    squadSize: 'Medium Project Team (3-5 Engineers)',
     timeline: 'Immediate (Within 48 Hours)',
     projectOverview: '',
     requestNda: true
@@ -122,7 +123,7 @@ export default function ContactPage({ setActiveTab }) {
                 onClick={() => setActiveTab('agency')}
                 className="px-5 py-2.5 rounded-xl bg-[#0f1d31] hover:bg-[#0b1525] text-white font-bold text-xs transition-colors cursor-pointer shadow-sm"
               >
-                Return to Overview
+                Return to Home
               </button>
             </div>
           </div>
@@ -135,7 +136,7 @@ export default function ContactPage({ setActiveTab }) {
               
               <div className="border-b border-slate-200 pb-4">
                 <h2 className="text-xl font-extrabold text-[#0f1d31] font-heading">Project Inquiry Form</h2>
-                <p className="text-xs text-slate-500 font-normal mt-0.5">Fill in your details below to request a consult or custom squad breakdown.</p>
+                <p className="text-xs text-slate-500 font-normal mt-0.5">Fill in your details below to request a consult or custom project scope breakdown.</p>
               </div>
 
               <form onSubmit={handleSubmit} className="space-y-6 text-xs">
@@ -229,7 +230,7 @@ export default function ContactPage({ setActiveTab }) {
                         onChange={handleChange}
                         className="w-full py-3 px-3.5 rounded-xl bg-slate-50 border border-slate-300 text-[#0f1d31] focus:bg-white focus:border-blue-600 focus:outline-none font-semibold cursor-pointer"
                       >
-                        <option value="Dedicated Software Engineering Squads">Dedicated Software Engineering Squads</option>
+                        <option value="Enterprise IT Solutions & Custom Software">Enterprise IT Solutions & Custom Software</option>
                         <option value="Cyber Security Penetration Testing & Audit">Cyber Security Penetration Testing & Audit</option>
                         <option value="AI & Machine Learning Systems">AI & Machine Learning Systems</option>
                         <option value="Microsoft 365 & Security Hardening">Microsoft 365 & Security Hardening</option>
@@ -256,7 +257,7 @@ export default function ContactPage({ setActiveTab }) {
 
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div className="space-y-1.5">
-                      <label className="font-bold text-slate-700">Squad Size / Scope</label>
+                      <label className="font-bold text-slate-700">Project Scope / Engagement Size</label>
                       <select
                         name="squadSize"
                         value={formData.squadSize}
@@ -264,9 +265,9 @@ export default function ContactPage({ setActiveTab }) {
                         className="w-full py-3 px-3.5 rounded-xl bg-slate-50 border border-slate-300 text-[#0f1d31] focus:bg-white focus:border-blue-600 focus:outline-none font-semibold cursor-pointer"
                       >
                         <option value="1 Senior Specialist / Architect">1 Senior Specialist / Architect</option>
-                        <option value="Small Squad (2-3 Engineers)">Small Squad (2-3 Engineers)</option>
-                        <option value="Medium Managed Squad (4-6 Engineers)">Medium Managed Squad (4-6 Engineers)</option>
-                        <option value="Enterprise Squad (7+ Engineers)">Enterprise Squad (7+ Engineers)</option>
+                        <option value="Core Project Team (2-3 Engineers)">Core Project Team (2-3 Engineers)</option>
+                        <option value="Medium Project Team (4-6 Engineers)">Medium Project Team (4-6 Engineers)</option>
+                        <option value="Enterprise Full-Scale Delivery (7+ Specialists)">Enterprise Full-Scale Delivery (7+ Specialists)</option>
                         <option value="Project-Based Audit / Security Assessment">Project-Based Audit / Security Assessment</option>
                       </select>
                     </div>
@@ -360,48 +361,59 @@ export default function ContactPage({ setActiveTab }) {
                 </div>
               </div>
 
-              {/* Global Locations Box */}
-              <div className="bg-white border border-slate-200 p-6 rounded-3xl space-y-3 shadow-sm text-xs">
-                <h3 className="text-sm font-extrabold text-[#0f1d31] uppercase tracking-wider font-heading">Global Locations</h3>
+              {/* Office Location & Contact Box */}
+              <div className="bg-white border border-slate-200 p-6 rounded-3xl space-y-4 shadow-sm text-xs">
+                <h3 className="text-sm font-extrabold text-[#0f1d31] uppercase tracking-wider font-heading">
+                  Location & Contact
+                </h3>
 
-                <div className="space-y-3 text-slate-700">
-                  <div className="p-3 rounded-xl bg-slate-50 border border-slate-200">
-                    <div className="font-extrabold text-[#0f1d31]">🇺🇸 North America Hub</div>
-                    <p className="text-slate-500 text-[11px] mt-0.5">New York & Delaware Operations</p>
+                <div className="space-y-3">
+                  {/* Location Icon Item */}
+                  <div className="flex items-start gap-3 p-3 rounded-xl bg-slate-50 border border-slate-200/80">
+                    <div className="w-8 h-8 rounded-lg bg-blue-50 border border-blue-200/60 flex items-center justify-center shrink-0 mt-0.5 text-blue-600">
+                      <MapPin className="w-4 h-4" />
+                    </div>
+                    <div>
+                      <div className="font-extrabold text-[#0f1d31] text-xs">Abuja, Nigeria</div>
+                      <p className="text-slate-500 text-[11px] mt-0.5">Federal Capital Territory, Nigeria</p>
+                    </div>
                   </div>
 
-                  <div className="p-3 rounded-xl bg-slate-50 border border-slate-200">
-                    <div className="font-extrabold text-[#0f1d31]">🇬🇧 European Hub</div>
-                    <p className="text-slate-500 text-[11px] mt-0.5">London, United Kingdom</p>
+                  {/* Phone Icon Item */}
+                  <div className="flex items-start gap-3 p-3 rounded-xl bg-slate-50 border border-slate-200/80">
+                    <div className="w-8 h-8 rounded-lg bg-blue-50 border border-blue-200/60 flex items-center justify-center shrink-0 mt-0.5 text-blue-600">
+                      <Phone className="w-4 h-4" />
+                    </div>
+                    <div>
+                      <div className="font-extrabold text-[#0f1d31] text-xs">Phone</div>
+                      <a 
+                        href="tel:+2348007233674" 
+                        className="text-slate-600 hover:text-blue-600 font-medium text-[11px] mt-0.5 block transition-colors"
+                      >
+                        +234 (0) 800-723-3674
+                      </a>
+                    </div>
                   </div>
 
-                  <div className="p-3 rounded-xl bg-slate-50 border border-slate-200">
-                    <div className="font-extrabold text-[#0f1d31]">🇳🇬 African Tech Center</div>
-                    <p className="text-slate-500 text-[11px] mt-0.5">Abuja & Lagos, Nigeria</p>
+                  {/* Email Icon Item */}
+                  <div className="flex items-start gap-3 p-3 rounded-xl bg-slate-50 border border-slate-200/80">
+                    <div className="w-8 h-8 rounded-lg bg-blue-50 border border-blue-200/60 flex items-center justify-center shrink-0 mt-0.5 text-blue-600">
+                      <Mail className="w-4 h-4" />
+                    </div>
+                    <div>
+                      <div className="font-extrabold text-[#0f1d31] text-xs">Email</div>
+                      <a 
+                        href="mailto:consult@sovereign2freshempire.com" 
+                        className="text-slate-600 hover:text-blue-600 font-medium text-[11px] mt-0.5 block transition-colors break-all"
+                      >
+                        consult@sovereign2freshempire.com
+                      </a>
+                    </div>
                   </div>
                 </div>
               </div>
 
-              {/* Key Commitments Box */}
-              <div className="bg-white border border-slate-200 p-6 rounded-3xl space-y-2.5 text-xs text-slate-700 shadow-sm">
-                <h3 className="text-sm font-extrabold text-[#0f1d31] uppercase tracking-wider mb-2 font-heading">Our Guarantees</h3>
-                <p className="text-slate-600 text-[11px] flex items-center gap-2 font-medium">
-                  <span className="w-1.5 h-1.5 rounded-full bg-blue-600 shrink-0" />
-                  100% Client IP Assignment
-                </p>
-                <p className="text-slate-600 text-[11px] flex items-center gap-2 font-medium">
-                  <span className="w-1.5 h-1.5 rounded-full bg-blue-600 shrink-0" />
-                  Dual-Layer International NDAs
-                </p>
-                <p className="text-slate-600 text-[11px] flex items-center gap-2 font-medium">
-                  <span className="w-1.5 h-1.5 rounded-full bg-blue-600 shrink-0" />
-                  48-Hour Free Talent Replacement SLA
-                </p>
-                <p className="text-slate-600 text-[11px] flex items-center gap-2 font-medium">
-                  <span className="w-1.5 h-1.5 rounded-full bg-blue-600 shrink-0" />
-                  Full EST / PST / GMT Timezone Alignment
-                </p>
-              </div>
+
 
             </div>
 

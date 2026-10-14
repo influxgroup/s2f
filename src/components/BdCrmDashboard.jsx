@@ -33,7 +33,7 @@ export default function BdCrmDashboard() {
             Lead Generation Signals & <span className="text-[#1d4ed8]">Outreach Engine.</span>
           </h2>
           <p className="text-slate-700 text-sm sm:text-base leading-relaxed">
-            Monitor active remote software engineering hiring signals across US, UK, and Canadian markets, and dispatch consultative talent outreach.
+            Monitor active remote software engineering hiring signals across US, UK, and Canadian markets, and dispatch consultative engineering squad outreach.
           </p>
         </div>
 

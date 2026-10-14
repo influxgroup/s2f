@@ -55,15 +55,11 @@ export default function DiscoveryModal({ isOpen, onClose }) {
         {!submitted ? (
           <>
             <div className="space-y-2">
-              <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-blue-950 text-blue-400 border border-blue-800/60 text-[11px] font-bold uppercase">
-                <Sparkles className="w-3.5 h-3.5" />
-                <span>Confidential Discovery Consultation</span>
-              </div>
               <h3 className="text-2xl font-extrabold text-white font-heading">
                 Book Technical Architecture Consult
               </h3>
               <p className="text-xs text-slate-300 leading-relaxed">
-                Synthesize your requirements with a Senior Sovereign2Fresh Empire Architect. Receive squad recommendations within 24 hours.
+                Synthesize your requirements with a Senior Sovereign2Fresh Empire IT Architect. Receive tailored proposals within 24 hours.
               </p>
             </div>
 
@@ -117,20 +113,21 @@ export default function DiscoveryModal({ isOpen, onClose }) {
                     <option>Python & AI / LLM Engineering</option>
                     <option>DevOps & Kubernetes Infrastructure</option>
                     <option>UI/UX & Frontend Engineering</option>
-                    <option>Custom Dedicated Squad</option>
+                    <option>Cyber Security & Code Hardening</option>
+                    <option>Custom IT Project / Systems</option>
                   </select>
                 </div>
                 <div>
-                  <label className="block text-slate-300 font-bold mb-1">Desired Squad Size</label>
+                  <label className="block text-slate-300 font-bold mb-1">Project Scope / Engagement</label>
                   <select
                     value={formData.squadSize}
                     onChange={(e) => setFormData({ ...formData, squadSize: e.target.value })}
                     className="w-full bg-[#0a1628] text-white py-2.5 px-3 rounded-xl border border-blue-900/60 focus:outline-none font-medium"
                   >
-                    <option>Individual Senior Specialist (1 Dev)</option>
-                    <option>Medium Squad (2-3 Engineers)</option>
-                    <option>Full Squad (4-6 Engineers + Lead)</option>
-                    <option>Enterprise Multi-Squad</option>
+                    <option>Individual Specialist / Consultant</option>
+                    <option>Core Project Team (2-3 Engineers)</option>
+                    <option>Full Development Team (4-6 Specialists)</option>
+                    <option>Enterprise Full-Scale Delivery</option>
                   </select>
                 </div>
               </div>
@@ -165,7 +162,7 @@ export default function DiscoveryModal({ isOpen, onClose }) {
               Consultation Scheduled!
             </h3>
             <p className="text-xs text-slate-300 max-w-md mx-auto leading-relaxed">
-              Thank you, <strong className="text-blue-400">{formData.contactName}</strong>. Our Senior Technical Lead has received your request for <strong className="text-white">{formData.companyName}</strong> and will email you squad recommendations within 24 hours.
+              Thank you, <strong className="text-blue-400">{formData.contactName}</strong>. Our Senior Technical Lead has received your request for <strong className="text-white">{formData.companyName}</strong> and will email you tailored IT project recommendations within 24 hours.
             </p>
 
             <button

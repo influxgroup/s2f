@@ -57,16 +57,16 @@ sequenceDiagram
     autonumber
     actor Client as International Client (US/UK/CA)
     participant Agency as CypherLord Tech Core Leadership
-    participant Talent as Verified Talent Pool
+    participant Squad as Dedicated Engineering Squad
     
     Client->>Agency: 1. Client Inquiry (Project Scope & Stack Requirements)
     Agency->>Client: 2. Discovery Consult & Technical Roadmap Definition
     Agency->>Agency: 3. Internal Review & Resource Assessment
-    Agency->>Talent: 4. Build Team & Assign Roles (Developers, UI/UX, QA, Lead)
+    Agency->>Squad: 4. Build Squad & Assign Roles (Developers, UI/UX, QA, Lead)
     Agency->>Client: 5. Execute Dual-Layer Contracts & NDAs
-    Agency->>Talent: 6. Project Execution, Agile Sprints & QA Review
+    Agency->>Squad: 6. Project Execution, Agile Sprints & QA Review
     Client->>Agency: 7. Centralized Payment & Escrow Settlement
-    Agency->>Talent: Distribute Payroll & Retain Agency Margin
+    Agency->>Squad: Distribute Payroll & Retain Agency Margin
 ```
 
 1. **Client Inquiry**: Inbound or outbound lead submission detailing company background, technical stack requirements, project scope, budget, and desired timelines.

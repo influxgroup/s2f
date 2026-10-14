@@ -244,7 +244,7 @@ export const vettingStageDetails = [
     stage: 5,
     title: "Verification, Legal & Onboarding",
     passRate: "Top 3% Accepted",
-    description: "Background check signoff, reference verification, binding NDA execution, and profile activation in Sovereign2Fresh Empire Talent Registry.",
+    description: "Background check signoff, reference verification, binding NDA execution, and onboarding into Sovereign2Fresh Empire engineering squads.",
     icon: "ShieldCheck"
   }
 ];

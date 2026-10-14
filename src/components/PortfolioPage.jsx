@@ -1,63 +1,30 @@
 import React, { useState } from 'react';
-import { Search, Briefcase, ArrowRight, X, Plus, Upload, Image as ImageIcon, ExternalLink, Globe, ChevronLeft, ChevronRight, Trash2 } from 'lucide-react';
+import { Search, Briefcase, ArrowRight, X, Globe, ChevronLeft, ChevronRight } from 'lucide-react';
+import { useCms } from '../context/CmsContext';
 
 export default function PortfolioPage({ openDiscoveryModal }) {
+  const { content } = useCms();
   const [activeCategory, setActiveCategory] = useState('All');
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedCaseStudy, setSelectedCaseStudy] = useState(null);
   const [activeImageIndex, setActiveImageIndex] = useState(0);
-  const [isAddModalOpen, setIsAddModalOpen] = useState(false);
+  const [currentPage, setCurrentPage] = useState(1);
+  const ITEMS_PER_PAGE = 9; // 3 per row x 3 rows max per page
 
   const categories = ['All', 'AI & Enterprise', 'Fintech & HR', 'Agritech & Supply Chain', 'E-Commerce & EdTech', 'Cybersecurity & Media'];
 
-  // Form State for uploading custom project with multiple screenshots and live URL
-  const [newProject, setNewProject] = useState({
-    title: '',
-    client: '',
-    flag: '🇳🇬',
-    category: 'AI & Enterprise',
-    liveUrl: '',
-    images: [],
-    stacks: '',
-    metric1Label: 'Docs / Users',
-    metric1Value: '10,000+',
-    metric2Label: 'Efficiency',
-    metric2Value: '+40%',
-    summary: '',
-    challenge: '',
-    solution: '',
-    results: ''
-  });
-
-  const handleMultipleImageUpload = (e) => {
-    const files = Array.from(e.target.files);
-    if (files.length > 0) {
-      const readers = files.map(file => {
-        return new Promise((resolve) => {
-          const reader = new FileReader();
-          reader.onloadend = () => resolve(reader.result);
-          reader.readAsDataURL(file);
-        });
-      });
-
-      Promise.all(readers).then(uploadedImages => {
-        setNewProject(prev => ({
-          ...prev,
-          images: [...prev.images, ...uploadedImages]
-        }));
-      });
-    }
+  const handleCategoryChange = (cat) => {
+    setActiveCategory(cat);
+    setCurrentPage(1);
   };
 
-  const handleRemoveUploadedImage = (indexToRemove) => {
-    setNewProject(prev => ({
-      ...prev,
-      images: prev.images.filter((_, idx) => idx !== indexToRemove)
-    }));
+  const handleSearchChange = (val) => {
+    setSearchTerm(val);
+    setCurrentPage(1);
   };
 
   // Case studies array with liveUrl and multiple images per project
-  const [caseStudies, setCaseStudies] = useState([
+  const fallbackCaseStudies = [
     {
       id: 1,
       title: "CV Transformer (AI SaaS Platform)",
@@ -377,61 +344,33 @@ export default function PortfolioPage({ openDiscoveryModal }) {
       solution: "Engineered an optimized React property portal with fast image loading, location filtering, and direct WhatsApp lead routing.",
       results: "Increased qualified buyer lead conversions by 45% within the first 60 days."
     }
-  ]);
+  ];
+
+  const rawProjects = (content?.portfolio && content.portfolio.length > 0)
+    ? content.portfolio
+    : fallbackCaseStudies;
+
+  const caseStudies = rawProjects.map(cs => {
+    const stackArray = Array.isArray(cs.stacks)
+      ? cs.stacks
+      : typeof cs.stacks === 'string'
+      ? cs.stacks.split(',').map(s => s.trim()).filter(Boolean)
+      : [];
+    return {
+      ...cs,
+      stacks: stackArray,
+      images: Array.isArray(cs.images) && cs.images.length > 0 ? cs.images : [cs.image].filter(Boolean),
+      metrics: Array.isArray(cs.metrics) && cs.metrics.length > 0 ? cs.metrics : [
+        { label: cs.metric1Label || 'Performance', value: cs.metric1Value || '99.9%' },
+        { label: cs.metric2Label || 'Delivery', value: cs.metric2Value || 'On Time' },
+        { label: 'Client Satisfaction', value: '100%' }
+      ]
+    };
+  });
 
   const openCaseStudyModal = (cs) => {
     setSelectedCaseStudy(cs);
     setActiveImageIndex(0);
-  };
-
-  const handleAddProjectSubmit = (e) => {
-    e.preventDefault();
-    const defaultImg = "https://images.unsplash.com/photo-1551288049-bebda4e38f71?auto=format&fit=crop&w=800&q=80";
-    const uploadedImgs = newProject.images.length > 0 ? newProject.images : [defaultImg];
-
-    const createdProject = {
-      id: Date.now(),
-      title: newProject.title || "Custom Enterprise Project",
-      client: newProject.client || "Client Enterprise (Nigeria)",
-      flag: newProject.flag || "🇳🇬",
-      category: newProject.category || "AI & Enterprise",
-      featured: false,
-      liveUrl: newProject.liveUrl || "",
-      image: uploadedImgs[0],
-      images: uploadedImgs,
-      stacks: newProject.stacks ? newProject.stacks.split(',').map(s => s.trim()) : ["React.js", "Node.js", "Security Controls"],
-      squadComposition: "1 IT Lead / Senior Engineer",
-      timeline: "2-4 Months Delivery",
-      metrics: [
-        { label: newProject.metric1Label || "Impact", value: newProject.metric1Value || "+40%" },
-        { label: newProject.metric2Label || "Uptime", value: newProject.metric2Value || "99.9%" }
-      ],
-      summary: newProject.summary || "Custom software system engineered and deployed by Sovereign2Fresh Empire.",
-      challenge: newProject.challenge || "Operational efficiency & systems integration goals.",
-      solution: newProject.solution || "Built secure, scalable React & automated workflow architecture.",
-      results: "Delivered on schedule with 100% client IP ownership."
-    };
-
-    setCaseStudies([createdProject, ...caseStudies]);
-    setIsAddModalOpen(false);
-    // Reset form
-    setNewProject({
-      title: '',
-      client: '',
-      flag: '🇳🇬',
-      category: 'AI & Enterprise',
-      liveUrl: '',
-      images: [],
-      stacks: '',
-      metric1Label: 'Docs / Users',
-      metric1Value: '10,000+',
-      metric2Label: 'Efficiency',
-      metric2Value: '+40%',
-      summary: '',
-      challenge: '',
-      solution: '',
-      results: ''
-    });
   };
 
   const filteredCaseStudies = caseStudies.filter(cs => {
@@ -445,17 +384,19 @@ export default function PortfolioPage({ openDiscoveryModal }) {
     return matchesCat && matchesSearch;
   });
 
+  const totalPages = Math.ceil(filteredCaseStudies.length / ITEMS_PER_PAGE) || 1;
+  const paginatedCaseStudies = filteredCaseStudies.slice(
+    (currentPage - 1) * ITEMS_PER_PAGE,
+    currentPage * ITEMS_PER_PAGE
+  );
+
   return (
     <section className="py-10 px-4 lg:px-8 bg-gradient-to-b from-[#edf1f7] via-[#e2eaf5] to-[#edf1f7] text-[#0f1d31] min-h-[85vh] relative">
       <div className="max-w-7xl mx-auto space-y-7">
         
-        {/* Header Bar with Add Case Study Trigger */}
-        <div className="flex flex-col md:flex-row items-center justify-between gap-4 border-b border-blue-200/80 pb-5">
+        {/* Header Bar */}
+        <div className="border-b border-blue-200/80 pb-5">
           <div className="space-y-1 text-center md:text-left max-w-2xl">
-            <div className="inline-flex items-center gap-2 px-3 py-0.5 rounded-full bg-blue-900/10 border border-blue-500/20 text-[#2563eb] text-[11px] font-extrabold uppercase">
-              <Briefcase className="w-3.5 h-3.5 text-[#2563eb]" />
-              <span>Proven Enterprise Engineering Projects</span>
-            </div>
             <h2 className="text-2xl sm:text-3xl font-extrabold text-[#0f1d31] tracking-tight font-heading">
               Sovereign2Fresh Empire Real-World Project <span className="text-[#1d4ed8]">Portfolio.</span>
             </h2>
@@ -463,14 +404,6 @@ export default function PortfolioPage({ openDiscoveryModal }) {
               Delivered across Nigeria and international enterprise markets — from AI automation tools and cyber-secure systems to high-scale web platforms.
             </p>
           </div>
-
-          <button
-            onClick={() => setIsAddModalOpen(true)}
-            className="px-4 py-2 rounded-xl bg-[#0f1d31] hover:bg-[#1e293b] text-white font-extrabold text-xs transition-all flex items-center gap-2 shadow-sm cursor-pointer shrink-0 active:scale-95 border border-blue-500/30"
-          >
-            <Plus className="w-4 h-4 text-[#60a5fa]" />
-            <span>+ Add Case Study</span>
-          </button>
         </div>
 
         {/* Compact Filter Controls Bar */}
@@ -481,7 +414,7 @@ export default function PortfolioPage({ openDiscoveryModal }) {
             {categories.map((cat) => (
               <button
                 key={cat}
-                onClick={() => setActiveCategory(cat)}
+                onClick={() => handleCategoryChange(cat)}
                 className={`px-3 py-1.5 rounded-xl text-xs font-extrabold transition-all shrink-0 cursor-pointer ${
                   activeCategory === cat
                     ? 'bg-[#0f1d31] text-white shadow-sm'
@@ -500,248 +433,168 @@ export default function PortfolioPage({ openDiscoveryModal }) {
               type="text"
               placeholder="Search by stack or project..."
               value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
+              onChange={(e) => handleSearchChange(e.target.value)}
               className="w-full bg-blue-50/50 text-[#0f1d31] text-xs py-2 pl-9 pr-3 rounded-xl border border-blue-200/80 focus:border-[#2563eb] focus:outline-none placeholder:text-slate-500 font-medium"
             />
           </div>
 
         </div>
 
-        {/* 3-Column Case Studies Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
-          {filteredCaseStudies.map((cs) => (
-            <div
-              key={cs.id}
-              onClick={() => openCaseStudyModal(cs)}
-              className="bg-white/95 backdrop-blur-xl rounded-2xl border border-blue-200/80 overflow-hidden shadow-sm hover:shadow-xl hover:border-[#2563eb] transition-all duration-300 flex flex-col justify-between cursor-pointer group hover:-translate-y-1"
+        {/* 3-Column Case Studies Grid (Max 3 Rows = 9 Cards per Page) */}
+        {filteredCaseStudies.length === 0 ? (
+          <div className="bg-white/90 backdrop-blur-md rounded-2xl border border-slate-200/90 p-12 text-center space-y-3">
+            <Briefcase className="w-10 h-10 text-slate-400 mx-auto" />
+            <h3 className="text-base font-bold text-slate-900">No projects found</h3>
+            <p className="text-xs text-slate-500 max-w-sm mx-auto">
+              No case studies match your current filter or search criteria.
+            </p>
+            <button
+              onClick={() => { setActiveCategory('All'); setSearchTerm(''); setCurrentPage(1); }}
+              className="px-3.5 py-1.5 rounded-lg bg-slate-900 text-white text-xs font-semibold hover:bg-slate-800 transition-colors cursor-pointer"
             >
-              <div>
-                {/* Image Screenshot Preview Container */}
-                <div className="relative h-44 overflow-hidden border-b border-slate-100 bg-slate-900">
-                  <img
-                    src={cs.images ? cs.images[0] : cs.image}
-                    alt={cs.title}
-                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-                  />
-                  <div className="absolute top-3 left-3 flex items-center gap-1.5">
-                    <span className="bg-[#0f1d31]/80 backdrop-blur-md text-white text-[10px] font-extrabold px-2.5 py-0.5 rounded-full border border-white/20 uppercase tracking-wider">
-                      {cs.category}
-                    </span>
-                    {cs.images && cs.images.length > 1 && (
-                      <span className="bg-blue-600/90 text-white text-[10px] font-bold px-2 py-0.5 rounded-full shadow-xs">
-                        {cs.images.length} Shots
+              Reset Filters
+            </button>
+          </div>
+        ) : (
+          <>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+              {paginatedCaseStudies.map((cs) => (
+                <div
+                  key={cs.id}
+                  onClick={() => openCaseStudyModal(cs)}
+                  className="bg-white/95 backdrop-blur-xl rounded-xl border border-slate-200/90 overflow-hidden shadow-xs hover:shadow-lg hover:border-blue-500 transition-all duration-200 flex flex-col justify-between cursor-pointer group hover:-translate-y-0.5"
+                >
+                  <div>
+                    {/* Image Screenshot Preview Container */}
+                    <div className="relative h-36 sm:h-40 overflow-hidden border-b border-slate-100 bg-slate-900 shrink-0">
+                      <img
+                        src={cs.images ? cs.images[0] : cs.image}
+                        alt={cs.title}
+                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                      />
+                      <div className="absolute top-2.5 left-2.5 flex items-center gap-1.5">
+                        <span className="bg-slate-950/80 backdrop-blur-md text-white text-[10px] font-semibold px-2 py-0.5 rounded border border-white/10 uppercase tracking-wider">
+                          {cs.category}
+                        </span>
+                        {cs.images && cs.images.length > 1 && (
+                          <span className="bg-blue-600/90 text-white text-[10px] font-semibold px-1.5 py-0.5 rounded shadow-xs">
+                            {cs.images.length} Shots
+                          </span>
+                        )}
+                      </div>
+                      <span className="absolute bottom-2.5 right-2.5 text-[11px] bg-slate-950/80 backdrop-blur-md text-slate-200 px-2 py-0.5 rounded font-medium border border-white/10">
+                        {cs.flag} {cs.client.split('(')[0]}
                       </span>
-                    )}
-                  </div>
-                  <span className="absolute bottom-3 right-3 text-xs bg-slate-900/80 backdrop-blur-md text-slate-200 px-2 py-0.5 rounded-md font-medium border border-white/10">
-                    {cs.flag} {cs.client.split('(')[0]}
-                  </span>
-                </div>
-
-                {/* Card Content Body */}
-                <div className="p-4 space-y-3">
-                  <h3 className="font-extrabold text-[#0f1d31] text-base font-heading group-hover:text-[#2563eb] transition-colors leading-snug">
-                    {cs.title}
-                  </h3>
-                  
-                  <p className="text-slate-600 text-xs line-clamp-2 leading-relaxed font-medium">
-                    {cs.summary}
-                  </p>
-
-                  {/* Tech Stack Pills */}
-                  <div className="flex flex-wrap gap-1.5 pt-1">
-                    {cs.stacks.slice(0, 4).map((tech, idx) => (
-                      <span key={idx} className="bg-blue-50/80 text-blue-900 text-[10px] font-bold px-2 py-0.5 rounded-md border border-blue-200/60">
-                        {tech}
-                      </span>
-                    ))}
-                    {cs.stacks.length > 4 && (
-                      <span className="text-[10px] text-slate-500 font-bold self-center">
-                        +{cs.stacks.length - 4} more
-                      </span>
-                    )}
-                  </div>
-                </div>
-              </div>
-
-              {/* Card Footer Metrics Ribbon */}
-              <div className="p-4 pt-0 space-y-3">
-                <div className="grid grid-cols-3 gap-2 bg-blue-50/50 p-2.5 rounded-xl border border-blue-100 text-center">
-                  {cs.metrics.map((m, mIdx) => (
-                    <div key={mIdx} className={mIdx > 0 ? "border-l border-blue-200/80" : ""}>
-                      <p className="font-extrabold text-[#1d4ed8] text-xs font-heading">{m.value}</p>
-                      <p className="text-[9px] text-slate-600 font-bold truncate">{m.label}</p>
-                    </div>
-                  ))}
-                </div>
-
-                <div className="flex items-center justify-between text-xs font-extrabold text-[#2563eb]">
-                  <span>View Project Details & Screenshots</span>
-                  <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-1 transition-transform" />
-                </div>
-              </div>
-
-            </div>
-          ))}
-        </div>
-
-        {/* Modal for Adding Custom Project with Multiple Image Upload & Live URL */}
-        {isAddModalOpen && (
-          <div className="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-md flex items-center justify-center p-4">
-            <div className="bg-white max-w-2xl w-full p-6 sm:p-8 rounded-3xl border border-blue-200 space-y-5 shadow-2xl relative max-h-[90vh] overflow-y-auto text-[#0f1d31]">
-              
-              <button
-                onClick={() => setIsAddModalOpen(false)}
-                className="absolute top-4 right-4 text-slate-500 hover:text-slate-900 font-bold text-sm bg-slate-100 w-8 h-8 rounded-full border border-slate-300 flex items-center justify-center cursor-pointer"
-              >
-                <X className="w-4 h-4" />
-              </button>
-
-              <div className="space-y-1">
-                <div className="inline-flex items-center gap-1.5 px-3 py-0.5 rounded-full bg-blue-50 text-[#1d4ed8] border border-blue-200 text-[10px] font-extrabold uppercase">
-                  <Upload className="w-3.5 h-3.5 text-[#2563eb]" />
-                  <span>Upload Showcase Case Study</span>
-                </div>
-                <h3 className="text-xl font-extrabold text-[#0f1d31] font-heading">
-                  Add New Project Showcase
-                </h3>
-              </div>
-
-              <form onSubmit={handleAddProjectSubmit} className="space-y-4 text-xs font-semibold">
-                
-                {/* Multiple Image Upload Input */}
-                <div className="space-y-2">
-                  <label className="block text-slate-700 font-bold">
-                    Project Screenshots (Upload Multiple Images)
-                  </label>
-                  
-                  <div className="border-2 border-dashed border-blue-200 hover:border-[#2563eb] bg-blue-50/40 p-4 rounded-2xl text-center space-y-2 relative transition-all">
-                    <div className="py-2 space-y-1">
-                      <ImageIcon className="w-8 h-8 mx-auto text-[#2563eb]" />
-                      <p className="text-xs text-slate-700 font-bold">Click to select screenshot files from your device</p>
-                      <p className="text-[10px] text-slate-500">Supports selecting multiple PNG, JPG, WEBP screenshots</p>
                     </div>
 
-                    <input
-                      type="file"
-                      multiple
-                      accept="image/*"
-                      onChange={handleMultipleImageUpload}
-                      className="absolute inset-0 opacity-0 cursor-pointer w-full h-full"
-                    />
+                    {/* Card Content Body */}
+                    <div className="p-3.5 space-y-2">
+                      <h3 className="font-bold text-slate-900 text-sm sm:text-[15px] font-heading group-hover:text-blue-600 transition-colors leading-snug line-clamp-1">
+                        {cs.title}
+                      </h3>
+                      
+                      <p className="text-slate-600 text-xs line-clamp-2 leading-relaxed font-normal">
+                        {cs.summary}
+                      </p>
+
+                      {/* Tech Stack Pills */}
+                      <div className="flex flex-wrap gap-1 pt-0.5">
+                        {cs.stacks.slice(0, 3).map((tech, idx) => (
+                          <span key={idx} className="bg-slate-100 text-slate-700 text-[10px] font-medium px-2 py-0.5 rounded border border-slate-200/60">
+                            {tech}
+                          </span>
+                        ))}
+                        {cs.stacks.length > 3 && (
+                          <span className="text-[10px] text-slate-500 font-semibold self-center px-1">
+                            +{cs.stacks.length - 3} more
+                          </span>
+                        )}
+                      </div>
+                    </div>
                   </div>
 
-                  {/* Uploaded Thumbnails Preview Grid */}
-                  {newProject.images.length > 0 && (
-                    <div className="flex flex-wrap gap-2 pt-1">
-                      {newProject.images.map((imgSrc, iIdx) => (
-                        <div key={iIdx} className="relative w-16 h-16 rounded-xl overflow-hidden border border-blue-300 group">
-                          <img src={imgSrc} alt={`Upload ${iIdx}`} className="w-full h-full object-cover" />
-                          <button
-                            type="button"
-                            onClick={() => handleRemoveUploadedImage(iIdx)}
-                            className="absolute top-1 right-1 bg-red-600 text-white p-1 rounded-full opacity-80 hover:opacity-100 transition-opacity"
-                          >
-                            <Trash2 className="w-3 h-3" />
-                          </button>
+                  {/* Card Footer Metrics Ribbon */}
+                  <div className="p-3.5 pt-0 space-y-2.5">
+                    <div className="grid grid-cols-3 gap-1 bg-slate-50/90 p-2 rounded-lg border border-slate-200/70 text-center">
+                      {cs.metrics.map((m, mIdx) => (
+                        <div key={mIdx} className={mIdx > 0 ? "border-l border-slate-200" : ""}>
+                          <p className="font-bold text-blue-700 text-xs font-heading">{m.value}</p>
+                          <p className="text-[9px] text-slate-500 font-medium truncate mt-0.5">{m.label}</p>
                         </div>
                       ))}
                     </div>
-                  )}
-                </div>
 
-                {/* Live URL Input Box */}
-                <div>
-                  <label className="block text-slate-700 font-bold mb-1">
-                    Live Project Application URL (Optional)
-                  </label>
-                  <div className="relative">
-                    <Globe className="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
-                    <input
-                      type="url"
-                      placeholder="https://myprojectdemo.com"
-                      value={newProject.liveUrl}
-                      onChange={(e) => setNewProject({ ...newProject, liveUrl: e.target.value })}
-                      className="w-full bg-blue-50/40 text-[#0f1d31] py-2.5 pl-9 pr-3 rounded-xl border border-blue-200 focus:border-[#2563eb] focus:outline-none font-mono text-xs"
-                    />
-                  </div>
-                </div>
-
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                  <div>
-                    <label className="block text-slate-700 font-bold mb-1">Project Title</label>
-                    <input
-                      type="text"
-                      required
-                      placeholder="e.g. CV Transformer AI SaaS"
-                      value={newProject.title}
-                      onChange={(e) => setNewProject({ ...newProject, title: e.target.value })}
-                      className="w-full bg-blue-50/40 text-[#0f1d31] py-2 px-3 rounded-xl border border-blue-200 focus:border-[#2563eb] focus:outline-none"
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-slate-700 font-bold mb-1">Client Name & Country</label>
-                    <input
-                      type="text"
-                      required
-                      placeholder="e.g. Zeenab Foods Ltd. (Abuja, Nigeria)"
-                      value={newProject.client}
-                      onChange={(e) => setNewProject({ ...newProject, client: e.target.value })}
-                      className="w-full bg-blue-50/40 text-[#0f1d31] py-2 px-3 rounded-xl border border-blue-200 focus:border-[#2563eb] focus:outline-none"
-                    />
-                  </div>
-                </div>
-
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                  <div>
-                    <label className="block text-slate-700 font-bold mb-1">Industry Category</label>
-                    <select
-                      value={newProject.category}
-                      onChange={(e) => setNewProject({ ...newProject, category: e.target.value })}
-                      className="w-full bg-blue-50/40 text-[#0f1d31] py-2 px-3 rounded-xl border border-blue-200 focus:outline-none"
-                    >
-                      <option value="AI & Enterprise">AI & Enterprise</option>
-                      <option value="Fintech & HR">Fintech & HR</option>
-                      <option value="Agritech & Supply Chain">Agritech & Supply Chain</option>
-                      <option value="E-Commerce & EdTech">E-Commerce & EdTech</option>
-                      <option value="Cybersecurity & Media">Cybersecurity & Media</option>
-                    </select>
+                    <div className="flex items-center justify-between text-xs font-semibold text-blue-600 group-hover:text-blue-700 transition-colors pt-0.5">
+                      <span>View Project Details & Screenshots</span>
+                      <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-1 transition-transform" />
+                    </div>
                   </div>
 
-                  <div>
-                    <label className="block text-slate-700 font-bold mb-1">Tech Stack (comma separated)</label>
-                    <input
-                      type="text"
-                      placeholder="Flutter, Laravel, React Native, AWS"
-                      value={newProject.stacks}
-                      onChange={(e) => setNewProject({ ...newProject, stacks: e.target.value })}
-                      className="w-full bg-blue-50/40 text-[#0f1d31] py-2 px-3 rounded-xl border border-blue-200 focus:border-[#2563eb] focus:outline-none"
-                    />
-                  </div>
                 </div>
-
-                <div>
-                  <label className="block text-slate-700 font-bold mb-1">Project Summary</label>
-                  <textarea
-                    rows={2}
-                    placeholder="Brief summary of system built and delivered..."
-                    value={newProject.summary}
-                    onChange={(e) => setNewProject({ ...newProject, summary: e.target.value })}
-                    className="w-full bg-blue-50/40 text-[#0f1d31] py-2 px-3 rounded-xl border border-blue-200 focus:border-[#2563eb] focus:outline-none resize-none"
-                  />
-                </div>
-
-                <button
-                  type="submit"
-                  className="w-full py-3 rounded-xl bg-[#2563eb] text-white font-extrabold text-xs hover:bg-[#1d4ed8] transition-all shadow-md cursor-pointer"
-                >
-                  Publish Project Showcase
-                </button>
-
-              </form>
-
+              ))}
             </div>
-          </div>
+
+            {/* Pagination Controls */}
+            {totalPages > 1 && (
+              <div className="flex flex-col sm:flex-row items-center justify-between gap-4 pt-5 border-t border-slate-200/80">
+                <p className="text-xs text-slate-500 font-medium">
+                  Showing <span className="font-semibold text-slate-900">{(currentPage - 1) * ITEMS_PER_PAGE + 1}</span> to{' '}
+                  <span className="font-semibold text-slate-900">{Math.min(currentPage * ITEMS_PER_PAGE, filteredCaseStudies.length)}</span> of{' '}
+                  <span className="font-semibold text-slate-900">{filteredCaseStudies.length}</span> case studies
+                </p>
+
+                <div className="flex items-center gap-1.5">
+                  <button
+                    onClick={() => {
+                      if (currentPage > 1) {
+                        setCurrentPage(p => p - 1);
+                        window.scrollTo({ top: 120, behavior: 'smooth' });
+                      }
+                    }}
+                    disabled={currentPage === 1}
+                    className="px-3 py-1.5 rounded-lg border text-xs font-medium flex items-center gap-1 transition-all cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed bg-white border-slate-200 text-slate-700 hover:bg-slate-50"
+                  >
+                    <ChevronLeft className="w-3.5 h-3.5" />
+                    <span>Prev</span>
+                  </button>
+
+                  {Array.from({ length: totalPages }, (_, i) => i + 1).map((pageNum) => {
+                    const isActive = pageNum === currentPage;
+                    return (
+                      <button
+                        key={pageNum}
+                        onClick={() => {
+                          setCurrentPage(pageNum);
+                          window.scrollTo({ top: 120, behavior: 'smooth' });
+                        }}
+                        className={`w-8 h-8 rounded-lg text-xs font-semibold transition-all cursor-pointer ${
+                          isActive
+                            ? 'bg-slate-900 text-white shadow-xs'
+                            : 'bg-white border border-slate-200 text-slate-700 hover:bg-slate-50'
+                        }`}
+                      >
+                        {pageNum}
+                      </button>
+                    );
+                  })}
+
+                  <button
+                    onClick={() => {
+                      if (currentPage < totalPages) {
+                        setCurrentPage(p => p + 1);
+                        window.scrollTo({ top: 120, behavior: 'smooth' });
+                      }
+                    }}
+                    disabled={currentPage === totalPages}
+                    className="px-3 py-1.5 rounded-lg border text-xs font-medium flex items-center gap-1 transition-all cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed bg-white border-slate-200 text-slate-700 hover:bg-slate-50"
+                  >
+                    <span>Next</span>
+                    <ChevronRight className="w-3.5 h-3.5" />
+                  </button>
+                </div>
+              </div>
+            )}
+          </>
         )}
 
         {/* Case Study Full Detail Modal with Multi-Image Carousel & Live URL Box */}

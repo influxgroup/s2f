@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Layers, FileText, Search, Users, ShieldCheck, Code2, DollarSign, CheckCircle2, ArrowRight } from 'lucide-react';
+import { ArrowRight, CheckCircle2 } from 'lucide-react';
 
 export default function WorkflowSection({ openDiscoveryModal }) {
   const [activeStep, setActiveStep] = useState(0);
@@ -7,198 +7,152 @@ export default function WorkflowSection({ openDiscoveryModal }) {
   const steps = [
     {
       step: "01",
-      title: "Client Inquiry & Intake",
-      subtitle: "Requirement Synthesis",
-      icon: FileText,
+      tabLabel: "Discovery & Architecture",
+      title: "Technical Discovery & Architecture Blueprint",
+      subtitle: "Scope & System Design",
       image: "https://images.unsplash.com/photo-1556761175-5973dc0f32e7?auto=format&fit=crop&w=800&q=80",
-      description: "Submit project scope, target tech stack, timeline, budget, and squad composition requirements through our consultative portal.",
-      details: [
-        "Tech stack qualification (React, Node, Python, AWS, DevOps)",
-        "Desired squad roles & seniority allocation",
-        "Target start date and timezone overlap needs"
+      description: "We work directly with your team to analyze requirements, map out database schemas, design modular system architecture, and establish sprint milestones.",
+      deliverables: [
+        "Comprehensive Architecture Specification & Stack Selection",
+        "Milestone Delivery Schedule & Sprint Roadmap",
+        "Security, Scalability & Compliance Planning"
       ]
     },
     {
       step: "02",
-      title: "Discovery & Architecture Consult",
-      subtitle: "Technical Roadmap",
-      icon: Search,
+      tabLabel: "Agile Development",
+      title: "Full-Stack Development & Agile Sprints",
+      subtitle: "Iterative Execution",
       image: "https://images.unsplash.com/photo-1531403009284-440f080d1e12?auto=format&fit=crop&w=800&q=80",
-      description: "Consultative architecture review with a Senior Sovereign2Fresh Empire Architect to define project milestones, delivery SLAs, and security standards.",
-      details: [
-        "System architecture & code base review",
-        "Security, HIPAA/GDPR & compliance alignment",
-        "Sprint cadence & milestone delivery schedule"
+      description: "Our engineers build your software in structured 2-week agile sprints, featuring clean modular code, automated CI/CD pipelines, and weekly working demos.",
+      deliverables: [
+        "Direct Git Repository Collaboration & Clean Commit History",
+        "Weekly Working Software Demos & Sprint Reviews",
+        "Automated Unit & Integration Test Coverage"
       ]
     },
     {
       step: "03",
-      title: "Internal Resource Assessment",
-      subtitle: "Talent Matching",
-      icon: Layers,
-      image: "https://images.unsplash.com/photo-1522071820081-009f0129c71c?auto=format&fit=crop&w=800&q=80",
-      description: "Agency leadership evaluates internal verified talent pool to reserve capacity or assemble specialized engineering squads.",
-      details: [
-        "Availability verification across top 3% talent registry",
-        "Peer skill alignment & stack compatibility check",
-        "Seniority & leadership assignment"
+      tabLabel: "Security Auditing",
+      title: "Cybersecurity Auditing & Code Hardening",
+      subtitle: "Vulnerability Defense",
+      image: "https://images.unsplash.com/photo-1550751827-4bd374c3f58b?auto=format&fit=crop&w=800&q=80",
+      description: "Before release, our security team conducts static and dynamic code audits, penetration testing, and cloud infrastructure hardening to eliminate vulnerabilities.",
+      deliverables: [
+        "OWASP Top 10 & API Vulnerability Assessment",
+        "Cloud IAM, Environment Secrets & Database Hardening",
+        "Technical Security Scorecard & Formal Attestation"
       ]
     },
     {
       step: "04",
-      title: "Build & Reserve Team Squad",
-      subtitle: "Squad Assembly",
-      icon: Users,
-      image: "https://images.unsplash.com/photo-1522202176988-66273c2fd55f?auto=format&fit=crop&w=800&q=80",
-      description: "Sovereign2Fresh Empire selects and reserves specific engineers (e.g. 2 Backend, 1 Frontend, 1 UI/UX, 1 QA Automation, 1 Tech Lead).",
-      details: [
-        "Dedicated squad configuration tailored to project",
-        "Developer profile portfolio packages provided to client",
-        "Instant talent reservation"
-      ]
-    },
-    {
-      step: "05",
-      title: "Dual-Layer Contracting & NDAs",
-      subtitle: "Legal Protection",
-      icon: ShieldCheck,
-      image: "https://images.unsplash.com/photo-1450133064473-71024230f91b?auto=format&fit=crop&w=800&q=80",
-      description: "Agency signs Master Services Agreement (MSA) with client. All talent signs strict binding NDAs and IP assignment contracts with Sovereign2Fresh Empire.",
-      details: [
-        "100% Client Intellectual Property Ownership",
-        "Dual binding Non-Disclosure Agreements",
-        "Disintermediation & liability safeguards"
-      ]
-    },
-    {
-      step: "06",
-      title: "Agile Project Execution & QA",
-      subtitle: "Sprint Delivery",
-      icon: Code2,
+      tabLabel: "Production & Support",
+      title: "Production Rollout & Ongoing SLA Support",
+      subtitle: "Cloud Launch & SLAs",
       image: "https://images.unsplash.com/photo-1517245386807-bb43f82c33c4?auto=format&fit=crop&w=800&q=80",
-      description: "Daily agile standups, weekly progress demos to client, continuous code review by Sovereign2Fresh Empire Tech Lead, and automated QA testing.",
-      details: [
-        "Dedicated Sovereign2Fresh Empire Tech Lead oversight on all PRs",
-        "Weekly progress reports & client sprint reviews",
-        "48-Hour Talent Replacement Guarantee active"
-      ]
-    },
-    {
-      step: "07",
-      title: "Centralized Payment Settlement",
-      subtitle: "Financial Assurance",
-      icon: DollarSign,
-      image: "https://images.unsplash.com/photo-1554224155-8d04cb21cd6c?auto=format&fit=crop&w=800&q=80",
-      description: "Single client invoice settled with Sovereign2Fresh Empire. Sovereign2Fresh Empire handles cross-border payroll, currency management, and talent disbursements.",
-      details: [
-        "Transparent billing (Retainer, T&M, or Fixed Milestone)",
-        "Cross-border SWIFT / Wise / Escrow handling",
-        "No payroll overhead or international tax burden for client"
+      description: "We execute zero-downtime production deployment, complete repository handover with 100% IP assignment, and provide reliable SLA-backed technical support.",
+      deliverables: [
+        "Zero-Downtime Cloud Deployment & Monitoring Setup",
+        "100% Intellectual Property & Repository Handover",
+        "Continuous Post-Launch Maintenance & Responsive SLA Support"
       ]
     }
   ];
 
+  const current = steps[activeStep];
+
   return (
-    <section className="py-14 sm:py-20 px-3 sm:px-6 lg:px-8 bg-sage-banner text-[#0f1d31] border-b border-[#b8c8e0] w-full max-w-full overflow-hidden">
-      <div className="max-w-7xl mx-auto space-y-8 sm:space-y-12 w-full min-w-0">
+    <section className="py-16 sm:py-20 px-4 sm:px-6 lg:px-8 bg-slate-50 border-b border-slate-200">
+      <div className="max-w-7xl mx-auto space-y-10">
         
         {/* Section Header */}
-        <div className="text-center space-y-3 sm:space-y-4 max-w-3xl mx-auto px-2">
-          <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-[#d0ddef] border border-[#a8bdd8] text-[#0f1d31] text-xs font-bold uppercase tracking-wider">
-            <Layers className="w-3.5 h-3.5 text-[#2563eb]" />
-            <span>End-to-End Operational Process</span>
-          </div>
-          <h2 className="text-2xl sm:text-4xl font-extrabold text-[#0f1d31] tracking-tight font-heading break-words">
-            The 7-Step Agency Delivery <span className="text-[#1d4ed8]">Workflow.</span>
+        <div className="text-center space-y-3 max-w-3xl mx-auto">
+          <h2 className="text-2xl sm:text-3xl lg:text-4xl font-extrabold text-slate-900 tracking-tight font-heading">
+            Our Project Delivery <span className="text-blue-600">Lifecycle.</span>
           </h2>
-          <p className="text-slate-700 text-xs sm:text-base leading-relaxed">
-            Our structured, high-touch operational workflow guarantees technical excellence, seamless communication, and risk-free project delivery.
+          <p className="text-slate-600 text-sm sm:text-base leading-relaxed font-normal">
+            A transparent, 4-stage engineering process designed to take your software from concept to secure, high-scale production.
           </p>
         </div>
 
         {/* Step Selector Horizontal Bar */}
-        <div className="flex items-center gap-2 overflow-x-auto pb-3 sm:pb-4 scrollbar-none justify-start lg:justify-center w-full max-w-full min-w-0 px-1">
+        <div className="flex items-center gap-2 overflow-x-auto pb-2 scrollbar-none justify-start sm:justify-center">
           {steps.map((s, idx) => {
             const isSelected = activeStep === idx;
             return (
               <button
                 key={idx}
                 onClick={() => setActiveStep(idx)}
-                className={`px-3.5 sm:px-4 py-2 sm:py-3 rounded-xl sm:rounded-2xl border text-xs font-bold transition-all shrink-0 flex items-center gap-2 cursor-pointer ${
+                className={`px-4 py-2 rounded-xl text-xs font-semibold transition-all shrink-0 cursor-pointer flex items-center gap-2 border ${
                   isSelected
-                    ? 'bg-[#0f1d31] text-white border-[#2563eb] shadow-md scale-105'
-                    : 'bg-white text-slate-700 border-[#b8c8e0] hover:bg-[#e0e8f4]'
+                    ? 'bg-slate-900 text-white border-slate-900 shadow-xs'
+                    : 'bg-white text-slate-700 border-slate-200 hover:bg-slate-100/80'
                 }`}
               >
-                <span className={`w-5 sm:w-6 h-5 sm:h-6 rounded-full flex items-center justify-center text-[10px] sm:text-[11px] ${
-                  isSelected ? 'bg-[#2563eb] text-white font-extrabold' : 'bg-slate-100 text-slate-700'
+                <span className={`w-5 h-5 rounded-full flex items-center justify-center text-[10px] font-bold ${
+                  isSelected ? 'bg-blue-600 text-white' : 'bg-slate-100 text-slate-700'
                 }`}>
                   {s.step}
                 </span>
-                <span className="whitespace-nowrap">{s.title.split(' ')[0]}</span>
+                <span>{s.tabLabel}</span>
               </button>
             );
           })}
         </div>
 
-        {/* Featured Step Visual Card */}
-        <div className="bg-[#0f1d31] text-white p-5 sm:p-10 rounded-2xl sm:rounded-3xl border border-[#2563eb] shadow-xl overflow-hidden relative w-full min-w-0">
-          
+        {/* Active Step Card */}
+        <div className="bg-white rounded-2xl border border-slate-200 p-6 sm:p-10 shadow-xs">
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
             
-            <div className="lg:col-span-7 space-y-6">
-              <div className="flex items-center gap-3">
-                <span className="text-3xl font-extrabold text-[#b5d6b2] font-heading bg-[#0a1628] px-4 py-1.5 rounded-2xl border border-[#2d4d38]">
-                  Step {steps[activeStep].step}
+            {/* Left Content */}
+            <div className="lg:col-span-7 space-y-5">
+              <div className="space-y-1">
+                <span className="text-xs font-bold text-blue-600 uppercase tracking-wider">
+                  Phase {current.step} • {current.subtitle}
                 </span>
-                <div>
-                  <span className="text-xs font-extrabold text-[#60a5fa] uppercase tracking-widest">
-                    {steps[activeStep].subtitle}
-                  </span>
-                  <h3 className="text-2xl font-extrabold text-white font-heading">
-                    {steps[activeStep].title}
-                  </h3>
-                </div>
+                <h3 className="text-xl sm:text-2xl font-bold text-slate-900 font-heading">
+                  {current.title}
+                </h3>
               </div>
 
-              <p className="text-slate-200 text-base leading-relaxed font-normal">
-                {steps[activeStep].description}
+              <p className="text-sm text-slate-600 leading-relaxed font-normal">
+                {current.description}
               </p>
 
+              {/* Deliverables List */}
               <div className="space-y-2.5 pt-2">
-                <p className="text-xs font-bold text-slate-300 uppercase tracking-wider">Key Deliverables & Operational Safeguards</p>
-                {steps[activeStep].details.map((detail, dIdx) => (
-                  <div key={dIdx} className="flex items-center gap-3 text-xs sm:text-sm text-slate-200 bg-[#0a1628] p-3 rounded-xl border border-[#2d4d38]">
-                    <CheckCircle2 className="w-4 h-4 text-[#60a5fa] shrink-0" />
-                    <span>{detail}</span>
+                <div className="text-xs font-semibold text-slate-900 uppercase tracking-wider">
+                  Key Deliverables
+                </div>
+                {current.deliverables.map((item, dIdx) => (
+                  <div key={dIdx} className="flex items-start gap-2.5 text-xs text-slate-700 font-medium">
+                    <CheckCircle2 className="w-4 h-4 text-blue-600 shrink-0 mt-0.5" />
+                    <span>{item}</span>
                   </div>
                 ))}
               </div>
 
-              <div className="pt-4">
+              <div className="pt-3">
                 <button
                   onClick={openDiscoveryModal}
-                  className="px-6 py-3.5 rounded-xl bg-[#2563eb] text-white font-extrabold text-xs hover:bg-[#1d4ed8] transition-all flex items-center gap-2 shadow-sm border border-[#69966c] active:scale-95 cursor-pointer"
+                  className="px-5 py-2.5 rounded-xl bg-slate-900 hover:bg-slate-800 text-white font-semibold text-xs transition-colors flex items-center gap-2 cursor-pointer shadow-xs active:scale-95"
                 >
-                  <span>Initiate Step 01 Consult</span>
+                  <span>Discuss Your Project</span>
                   <ArrowRight className="w-4 h-4" />
                 </button>
               </div>
             </div>
 
-            {/* Right Side: Step Photography Image */}
-            <div className="lg:col-span-5 relative image-card-zoom">
-              <div className="h-80 rounded-3xl overflow-hidden border-2 border-[#2563eb]/40 shadow-xl relative">
+            {/* Right Image */}
+            <div className="lg:col-span-5">
+              <div className="rounded-xl overflow-hidden border border-slate-200 aspect-[4/3] bg-slate-900 relative shadow-xs">
                 <img
-                  src={steps[activeStep].image}
-                  alt={steps[activeStep].title}
+                  src={current.image}
+                  alt={current.title}
                   className="w-full h-full object-cover"
                 />
-                <div className="absolute inset-0 bg-gradient-to-t from-[#0f1d31] via-transparent to-transparent opacity-80" />
-                
-                <div className="absolute bottom-4 left-4 right-4 p-3 rounded-xl bg-[#0f1d31]/90 border border-[#2563eb] text-xs font-bold text-white flex items-center justify-between">
-                  <span>Step {steps[activeStep].step}: {steps[activeStep].subtitle}</span>
-                  <span className="text-[#60a5fa]">S2F Empire Ops</span>
+                <div className="absolute bottom-3 left-3 bg-slate-950/80 backdrop-blur-md px-3 py-1 rounded-lg border border-white/10 text-white text-[11px] font-medium">
+                  Phase {current.step}: {current.tabLabel}
                 </div>
               </div>
             </div>

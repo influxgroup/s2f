@@ -1,146 +1,102 @@
 import React from 'react';
-import { Check, X, ShieldAlert, Zap, Award, ArrowUpRight } from 'lucide-react';
-import { useCms } from '../context/CmsContext';
+import { ArrowRight, Code2, ShieldCheck, FileCheck, Clock, CheckCircle2 } from 'lucide-react';
 
 export default function DifferentiationMatrix({ openDiscoveryModal }) {
-  const { content } = useCms();
-  const matrixList = (content?.differentiation && content.differentiation.length > 0)
-    ? content.differentiation.map(d => ({
-        feature: d.criterion || d.feature,
-        s2f: d.s2f,
-        marketplace: d.outsourcing || d.marketplace,
-        staffing: d.freelance || d.staffing
-      }))
-    : [
+  const standards = [
     {
-      feature: "Vetting & Quality Control",
-      s2f: "Top 3% Multi-Stage Code & Arch Audit",
-      marketplace: "Self-reported profiles & basic quizzes",
-      staffing: "Resume keyword matching"
+      title: "Production-Grade Architecture",
+      description: "Modern React, Next.js, Node.js, and Python systems engineered for high performance, modular architecture, and zero-downtime cloud scalability.",
+      features: [
+        "Modern Full-Stack Architectures",
+        "Clean REST & GraphQL Microservices",
+        "Automated CI/CD & Cloud Infrastructure"
+      ]
     },
     {
-      feature: "Delivery Accountability",
-      s2f: "Full Agency Delivery & QA Lead Oversight",
-      marketplace: "Individual freelancer responsibility",
-      staffing: "None (Placement only)"
+      title: "Built-In Cyber Security Baseline",
+      description: "Security is embedded into every development sprint with vulnerability audits, OWASP Top 10 mitigation, and identity management hardening.",
+      features: [
+        "Vulnerability Scans & Code Audits",
+        "Encrypted APIs & Access Controls",
+        "ISO 27001 & SOC 2 Aligned Best Practices"
+      ]
     },
     {
-      feature: "Disintermediation Protection",
-      s2f: "Contractual Agency Ownership & Dual NDAs",
-      marketplace: "High platform bypass risk",
-      staffing: "High one-time buyout fee"
+      title: "100% Client Intellectual Property",
+      description: "Complete ownership of every line of code, repository, and design asset from day one, backed by international NDAs and clear assignment terms.",
+      features: [
+        "Direct Client IP Assignment",
+        "Dual-Jurisdiction Binding NDAs",
+        "Zero Vendor Lock-in or Licensing Fees"
+      ]
     },
     {
-      feature: "Talent Replacement SLA",
-      s2f: "48-Hour Free Talent Replacement SLA",
-      marketplace: "Must re-hire & restart search",
-      staffing: "Slow 2-4 week replacement process"
-    },
-    {
-      feature: "Intellectual Property Ownership",
-      s2f: "100% Client IP Assignment & Dual NDAs",
-      marketplace: "Varies by contractor agreement",
-      staffing: "Requires separate legal addendums"
-    },
-    {
-      feature: "Timezone & Communication",
-      s2f: "Guaranteed 5-8 Hrs EST/PST/GMT Overlap",
-      marketplace: "Unpredictable communication windows",
-      staffing: "Varies by local placement"
+      title: "Transparent Agile Delivery",
+      description: "Clear milestone roadmaps, weekly working software demos, direct Git repository access, and dedicated technical leadership oversight.",
+      features: [
+        "Direct Git & Code Repository Access",
+        "Weekly Demos & Milestone Reviews",
+        "Direct Communication with Lead Engineers"
+      ]
     }
   ];
 
-
   return (
-    <section className="py-14 sm:py-20 px-4 sm:px-6 lg:px-8 bg-sage-banner border-b border-[#b8c8e0] w-full max-w-full overflow-hidden">
-      <div className="max-w-7xl mx-auto space-y-10 sm:space-y-12 w-full max-w-full min-w-0">
+    <section className="py-16 sm:py-20 px-4 sm:px-6 lg:px-8 bg-white border-b border-slate-200">
+      <div className="max-w-7xl mx-auto space-y-12">
         
-        {/* Section Title */}
-        <div className="text-center space-y-3 sm:space-y-4 max-w-3xl mx-auto px-2">
-          <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-[#d0ddef] border border-[#a8bdd8] text-[#0f1d31] text-xs font-bold uppercase tracking-wider">
-            <Award className="w-3.5 h-3.5 text-[#2563eb]" />
-            <span>Market Positioning</span>
-          </div>
-          <h2 className="text-2xl sm:text-4xl font-extrabold text-[#0f1d31] tracking-tight font-heading break-words">
-            Why Enterprise Leaders Choose <span className="text-[#1d4ed8]">Sovereign2Fresh Empire.</span>
+        {/* Section Header */}
+        <div className="text-center space-y-3 max-w-3xl mx-auto">
+          <h2 className="text-2xl sm:text-3xl lg:text-4xl font-extrabold text-slate-900 tracking-tight font-heading">
+            Enterprise Engineering Standards & <span className="text-blue-600">Guarantees.</span>
           </h2>
-          <p className="text-slate-700 text-xs sm:text-base leading-relaxed">
-            Unlike unvetted freelancer marketplaces or rigid staffing agencies, Sovereign2Fresh Empire combines rigorous talent verification, agency-level delivery guarantees, and enterprise legal protection.
+          <p className="text-slate-600 text-sm sm:text-base leading-relaxed font-normal">
+            How Sovereign2Fresh Empire delivers robust software systems, verified cybersecurity controls, and complete intellectual property protection.
           </p>
         </div>
 
-        {/* High-Contrast Comparison Table */}
-        <div className="w-full max-w-full overflow-x-auto rounded-2xl sm:rounded-3xl border border-[#b8c8e0] bg-white shadow-md min-w-0">
-          <table className="w-full text-left border-collapse min-w-[650px] sm:min-w-[700px]">
-            <thead>
-              <tr className="border-b border-[#b8c8e0] bg-[#0f1d31] text-white">
-                <th className="p-5 text-xs font-extrabold uppercase tracking-wider w-1/4">
-                  Feature / Capability
-                </th>
-                <th className="p-5 text-sm font-extrabold text-[#b5d6b2] bg-[#0a1628] w-1/3 border-x border-[#2d4d38]">
-                  <div className="flex items-center gap-2">
-                    <Zap className="w-4 h-4 text-[#60a5fa]" />
-                    <span>SOVEREIGN2FRESH EMPIRE MODEL</span>
+        {/* 4-Card Standards Grid */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          {standards.map((standard, idx) => (
+            <div
+              key={idx}
+              className="bg-slate-50/70 rounded-2xl border border-slate-200 p-6 sm:p-8 space-y-4 hover:border-blue-400 hover:shadow-xs transition-all"
+            >
+              <h3 className="text-lg sm:text-xl font-bold text-slate-900 font-heading">
+                {standard.title}
+              </h3>
+              <p className="text-xs sm:text-sm text-slate-600 leading-relaxed font-normal">
+                {standard.description}
+              </p>
+
+              <div className="pt-2 space-y-2 border-t border-slate-200/80">
+                {standard.features.map((feat, fIdx) => (
+                  <div key={fIdx} className="flex items-center gap-2 text-xs font-medium text-slate-700">
+                    <CheckCircle2 className="w-4 h-4 text-blue-600 shrink-0" />
+                    <span>{feat}</span>
                   </div>
-                </th>
-                <th className="p-5 text-xs font-extrabold uppercase tracking-wider text-slate-300 w-1/5">
-                  Freelance Marketplaces
-                </th>
-                <th className="p-5 text-xs font-extrabold uppercase tracking-wider text-slate-300 w-1/5">
-                  IT Staffing Agencies
-                </th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-slate-200 text-xs sm:text-sm text-slate-800">
-              {matrixList.map((row, idx) => (
-                <tr key={idx} className="hover:bg-[#e0e8f4]/60 transition-colors">
-
-                  <td className="p-5 font-bold text-[#0f1d31]">
-                    {row.feature}
-                  </td>
-
-                  {/* S2F Empire Column */}
-                  <td className="p-5 font-extrabold text-[#0f1d31] bg-[#e0e8f4] border-x border-[#b8c8e0] flex items-center gap-2.5">
-                    <div className="w-5 h-5 rounded-full bg-[#2563eb] text-white flex items-center justify-center shrink-0">
-                      <Check className="w-3.5 h-3.5 stroke-[3]" />
-                    </div>
-                    <span>{row.s2f}</span>
-                  </td>
-
-                  {/* Marketplace Column */}
-                  <td className="p-5 text-slate-500 font-medium">
-                    <div className="flex items-center gap-2">
-                      <X className="w-4 h-4 text-rose-500 shrink-0" />
-                      <span>{row.marketplace}</span>
-                    </div>
-                  </td>
-
-                  {/* Staffing Agency Column */}
-                  <td className="p-5 text-slate-500 font-medium">
-                    <div className="flex items-center gap-2">
-                      <ShieldAlert className="w-4 h-4 text-amber-600 shrink-0" />
-                      <span>{row.staffing}</span>
-                    </div>
-                  </td>
-
-                </tr>
-              ))}
-            </tbody>
-          </table>
+                ))}
+              </div>
+            </div>
+          ))}
         </div>
 
-        {/* Bottom Banner */}
-        <div className="p-6 sm:p-8 rounded-2xl sm:rounded-3xl bg-[#0f1d31] text-white border border-[#2563eb] flex flex-col sm:flex-row items-center justify-between gap-4 sm:gap-6 shadow-xl w-full text-center sm:text-left">
-          <div>
-            <h4 className="font-extrabold text-white text-base sm:text-lg font-heading">Ready to scale with guaranteed delivery?</h4>
-            <p className="text-xs text-slate-300 mt-1">Get custom squad recommendations matched to your technology stack in under 24 hours.</p>
+        {/* Bottom Action Banner */}
+        <div className="p-6 sm:p-8 rounded-2xl bg-slate-900 text-white flex flex-col sm:flex-row items-center justify-between gap-6 shadow-sm border border-slate-800">
+          <div className="space-y-1 text-center sm:text-left">
+            <h4 className="font-bold text-white text-base sm:text-lg font-heading">
+              Ready to build or secure your next digital platform?
+            </h4>
+            <p className="text-xs text-slate-400">
+              Schedule a technical consultation to review your project scope, architecture requirements, and timeline.
+            </p>
           </div>
           <button
             onClick={openDiscoveryModal}
-            className="w-full sm:w-auto px-6 sm:px-7 py-3 sm:py-3.5 rounded-xl bg-[#2563eb] text-white font-extrabold text-xs hover:bg-[#1d4ed8] transition-all flex items-center justify-center gap-2 shrink-0 shadow-sm border border-[#69966c] active:scale-95 cursor-pointer"
+            className="w-full sm:w-auto px-6 py-3 rounded-xl bg-blue-600 hover:bg-blue-500 text-white font-semibold text-xs transition-colors flex items-center justify-center gap-2 shrink-0 cursor-pointer shadow-xs active:scale-95"
           >
-            <span>Request Custom Squad</span>
-            <ArrowUpRight className="w-4 h-4" />
+            <span>Book Consultation</span>
+            <ArrowRight className="w-4 h-4" />
           </button>
         </div>
 
