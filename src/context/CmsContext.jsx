@@ -372,7 +372,8 @@ export const initialCmsDefaults = {
       freelance: 'Erratic schedules and uncoordinated availability'
     }
   ],
-  portfolio: [
+  portfolio: [],
+  _old_portfolio: [
     {
       id: 1,
       title: "CV Transformer (AI SaaS Platform)",
@@ -605,7 +606,8 @@ export const initialCmsDefaults = {
       summary: "Built a luxury real estate showcase platform featuring HD property image carousels, virtual walkthroughs, and instant agent lead capture."
     }
   ],
-  blog: [
+  blog: [],
+  _old_blog: [
     {
       id: 1,
       title: 'Bridging the Global Tech Gap: Why US Enterprises Are Scaling with African Engineers in 2026',
@@ -716,6 +718,15 @@ export const initialCmsDefaults = {
       { name: 'Cyber Security & OWASP', icon: '🛡️' },
       { name: 'PostgreSQL & Redis', icon: '🐘' },
     ],
+  },
+  siteSettings: {
+    siteTitle: 'Sovereign2Fresh Empire | Enterprise IT Solutions & Custom Software Development',
+    metaDescription: 'Sovereign2Fresh Empire delivers world-class enterprise IT solutions, bespoke software development, cloud infrastructure, and mission-critical cybersecurity for commercial businesses, government institutions, and private firms.',
+    headerLogo: '/s2f_logo_header.png',
+    footerLogo: '/s2f_logo_footer.png',
+    favicon: '/favicon.png',
+    ogImage: '/s2f_og_preview.png',
+    adminEmail: 'admin@sovereign2freshempire.com',
   }
 };
 
@@ -786,6 +797,9 @@ export function CmsProvider({ children }) {
               : initialCmsDefaults.cybersecurity.metrics,
           };
         }
+        if (parsed.siteSettings) {
+          parsed.siteSettings = { ...initialCmsDefaults.siteSettings, ...parsed.siteSettings };
+        }
         delete parsed.vetting;
         delete parsed.talent;
         delete parsed.calculator;
@@ -801,17 +815,14 @@ export function CmsProvider({ children }) {
   const [isLoading, setIsLoading] = useState(false);
   const [adminToken, setAdminToken] = useState(() => {
     try {
-      // Clear legacy persistent localStorage token so sessions require active authentication
-      localStorage.removeItem('s2f_admin_token');
-      localStorage.removeItem('s2f_admin_user');
-      return sessionStorage.getItem('s2f_admin_token') || '';
+      return sessionStorage.getItem('s2f_admin_token') || localStorage.getItem('s2f_admin_token') || '';
     } catch {
       return '';
     }
   });
   const [adminUser, setAdminUser] = useState(() => {
     try {
-      const u = sessionStorage.getItem('s2f_admin_user');
+      const u = sessionStorage.getItem('s2f_admin_user') || localStorage.getItem('s2f_admin_user');
       return u ? JSON.parse(u) : null;
     } catch {
       return null;
@@ -841,6 +852,49 @@ export function CmsProvider({ children }) {
     loadRemoteContent();
   }, []);
 
+  // Synchronize document meta tags and brand assets with live siteSettings
+  useEffect(() => {
+    if (content?.siteSettings) {
+      const s = content.siteSettings;
+      if (s.siteTitle) {
+        document.title = s.siteTitle;
+        const metaTitleTag = document.getElementById('meta-title-tag');
+        if (metaTitleTag) metaTitleTag.setAttribute('content', s.siteTitle);
+        const ogTitle = document.getElementById('og-title');
+        if (ogTitle) ogTitle.setAttribute('content', s.siteTitle);
+        const twTitle = document.getElementById('twitter-title');
+        if (twTitle) twTitle.setAttribute('content', s.siteTitle);
+      }
+      if (s.metaDescription) {
+        const metaDesc = document.getElementById('meta-description');
+        if (metaDesc) metaDesc.setAttribute('content', s.metaDescription);
+        const ogDesc = document.getElementById('og-description');
+        if (ogDesc) ogDesc.setAttribute('content', s.metaDescription);
+        const twDesc = document.getElementById('twitter-description');
+        if (twDesc) twDesc.setAttribute('content', s.metaDescription);
+      }
+      if (s.ogImage) {
+        const ogImg = document.getElementById('og-image');
+        if (ogImg) ogImg.setAttribute('content', s.ogImage);
+        const twImg = document.getElementById('twitter-image');
+        if (twImg) twImg.setAttribute('content', s.ogImage);
+      }
+      if (s.favicon) {
+        const fav = document.getElementById('app-favicon');
+        if (fav) fav.setAttribute('href', s.favicon);
+        const fav32 = document.getElementById('app-favicon-32');
+        if (fav32) fav32.setAttribute('href', s.favicon);
+      }
+    }
+  }, [content?.siteSettings]);
+
+  const setAdminUserProfile = (updatedUser) => {
+    setAdminUser(updatedUser);
+    try {
+      sessionStorage.setItem('s2f_admin_user', JSON.stringify(updatedUser));
+    } catch (e) {}
+  };
+
   // Update a single section (e.g. 'hero', 'services', etc.)
   const updateSection = async (sectionKey, data) => {
     setContent(prev => {
@@ -851,10 +905,12 @@ export function CmsProvider({ children }) {
       return next;
     });
 
-    if (adminToken) {
+    const activeToken = adminToken || sessionStorage.getItem('s2f_admin_token') || localStorage.getItem('s2f_admin_token');
+
+    if (activeToken) {
       try {
         setSaveStatus({ state: 'saving', message: `Saving ${sectionKey}...` });
-        await saveCmsSection(sectionKey, data, adminToken);
+        await saveCmsSection(sectionKey, data, activeToken);
         setSaveStatus({ state: 'success', message: `Saved ${sectionKey} to cloud database!` });
         setTimeout(() => setSaveStatus({ state: 'idle', message: '' }), 3000);
       } catch (err) {
@@ -875,14 +931,16 @@ export function CmsProvider({ children }) {
       localStorage.setItem('s2f_cms_content', JSON.stringify(dataToSave));
     } catch (e) {}
 
-    if (!adminToken) {
+    const activeToken = adminToken || sessionStorage.getItem('s2f_admin_token') || localStorage.getItem('s2f_admin_token');
+
+    if (!activeToken) {
       setSaveStatus({ state: 'success', message: 'Saved to browser cache. Log in to sync to cloud MySQL.' });
       setTimeout(() => setSaveStatus({ state: 'idle', message: '' }), 3500);
       return;
     }
 
     try {
-      await bulkSaveCms(dataToSave, adminToken);
+      await bulkSaveCms(dataToSave, activeToken);
       setSaveStatus({ state: 'success', message: 'Successfully published all changes to live database!' });
       setTimeout(() => setSaveStatus({ state: 'idle', message: '' }), 3500);
     } catch (err) {
@@ -899,7 +957,8 @@ export function CmsProvider({ children }) {
       localStorage.removeItem('s2f_cms_content');
     } catch (e) {}
 
-    if (adminToken) {
+    const activeToken = adminToken || sessionStorage.getItem('s2f_admin_token') || localStorage.getItem('s2f_admin_token');
+    if (activeToken) {
       await saveAllToCloud(initialCmsDefaults);
     }
   };
@@ -909,17 +968,19 @@ export function CmsProvider({ children }) {
     setIsLoading(true);
     try {
       const res = await loginAdmin(email, password);
-      if (res.token) {
-        setAdminToken(res.token);
-        setAdminUser(res.user);
+      const token = res.token || res.data?.token;
+      const user = res.user || res.data?.user;
+      if (token) {
+        setAdminToken(token);
+        setAdminUser(user);
         try {
-          sessionStorage.setItem('s2f_admin_token', res.token);
-          sessionStorage.setItem('s2f_admin_user', JSON.stringify(res.user));
-          localStorage.removeItem('s2f_admin_token');
-          localStorage.removeItem('s2f_admin_user');
+          sessionStorage.setItem('s2f_admin_token', token);
+          sessionStorage.setItem('s2f_admin_user', JSON.stringify(user));
+          localStorage.setItem('s2f_admin_token', token);
+          localStorage.setItem('s2f_admin_user', JSON.stringify(user));
         } catch (e) {}
         setIsLoading(false);
-        return { success: true, user: res.user };
+        return { success: true, user };
       }
       throw new Error(res.message || 'Login failed');
     } catch (err) {
@@ -939,8 +1000,8 @@ export function CmsProvider({ children }) {
         try {
           sessionStorage.setItem('s2f_admin_token', localToken);
           sessionStorage.setItem('s2f_admin_user', JSON.stringify(localUser));
-          localStorage.removeItem('s2f_admin_token');
-          localStorage.removeItem('s2f_admin_user');
+          localStorage.setItem('s2f_admin_token', localToken);
+          localStorage.setItem('s2f_admin_user', JSON.stringify(localUser));
         } catch (e) {}
         setIsLoading(false);
         return { success: true, user: localUser };
@@ -949,7 +1010,6 @@ export function CmsProvider({ children }) {
       throw err;
     }
   };
-
 
   // Admin logout handler
   const logout = () => {
@@ -972,6 +1032,7 @@ export function CmsProvider({ children }) {
         resetToFactoryDefaults,
         adminToken,
         adminUser,
+        setAdminUserProfile,
         isLoggedIn: Boolean(adminToken),
         isLoading,
         saveStatus,

@@ -131,7 +131,7 @@ export default function BlogPage({ openDiscoveryModal }) {
   const [newCommentName, setNewCommentName] = useState('');
   const [newCommentText, setNewCommentText] = useState('');
 
-  const rawArticles = Array.isArray(content?.blog) ? content.blog : fallbackArticles;
+  const rawArticles = Array.isArray(content?.blog) ? content.blog : [];
   const articles = rawArticles.map(art => ({
     ...art,
     image: art.image || art.coverImage || 'https://images.unsplash.com/photo-1522071820081-009f0129c71c?auto=format&fit=crop&w=800&q=80',

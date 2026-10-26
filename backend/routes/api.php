@@ -46,6 +46,8 @@ Route::prefix('v1')->group(function () {
     // ─── Protected Admin Endpoints ───
     Route::middleware('auth:sanctum')->group(function () {
         Route::get('/auth/me', [AuthController::class, 'profile']);
+        Route::put('/auth/profile', [AuthController::class, 'updateProfile']);
+        Route::put('/auth/password', [AuthController::class, 'updatePassword']);
         Route::post('/auth/logout', [AuthController::class, 'logout']);
 
         Route::prefix('admin')->group(function () {

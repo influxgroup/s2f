@@ -22,7 +22,11 @@ import { CmsProvider } from './context/CmsContext';
 
 function checkIsAdminUrl() {
   if (typeof window === 'undefined') return false;
-  return window.location.hash === '#admin' || window.location.search.includes('admin=true');
+  return (
+    window.location.pathname.startsWith('/admin') ||
+    window.location.hash === '#admin' ||
+    window.location.search.includes('admin=true')
+  );
 }
 
 function getInitialTab() {
@@ -67,8 +71,10 @@ function MainApp() {
 
   const handleExitAdmin = () => {
     setIsAdminView(false);
-    // Clean URL hash or search param without full page reload
-    if (window.location.hash === '#admin' || window.location.search.includes('admin=true')) {
+    // Clean URL pathname, hash, or search param without full page reload
+    if (window.location.pathname.startsWith('/admin')) {
+      window.history.pushState(null, '', '/');
+    } else if (window.location.hash === '#admin' || window.location.search.includes('admin=true')) {
       const cleanUrl = window.location.pathname;
       window.history.pushState(null, '', cleanUrl);
     }

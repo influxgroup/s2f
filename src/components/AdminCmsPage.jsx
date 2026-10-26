@@ -6,7 +6,9 @@ import {
   fetchAdminConsultations,
   updateConsultationStatus,
   fetchAdminSubscribers,
-  uploadMedia
+  uploadMedia,
+  updateAdminProfile,
+  updateAdminPassword
 } from '../services/api';
 import {
   LayoutDashboard,
@@ -39,7 +41,11 @@ import {
   Upload,
   Image,
   Loader2,
-  Globe
+  Globe,
+  Sliders,
+  Lock,
+  Key,
+  Shield
 } from 'lucide-react';
 import s2fLogoHeader from '../assets/s2f_logo_header.png';
 
@@ -51,6 +57,7 @@ export default function AdminCmsPage({ onExitAdmin }) {
     resetToFactoryDefaults,
     adminToken,
     adminUser,
+    setAdminUserProfile,
     isLoggedIn,
     saveStatus,
     login,

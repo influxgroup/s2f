@@ -9,6 +9,7 @@ export default function Footer({ setActiveTab, openDiscoveryModal }) {
   const phone = contact.phone || '+234 (0) 800-723-3674';
   const email = contact.email || 'info@sovereign2freshempire.com';
   const address = contact.officeAddress || 'Abuja, Federal Capital Territory, Nigeria';
+  const footerLogoSrc = cms?.content?.siteSettings?.footerLogo || s2fLogoFooter;
 
   const handleNavClick = (tab) => {
     setActiveTab(tab);
@@ -55,7 +56,7 @@ export default function Footer({ setActiveTab, openDiscoveryModal }) {
           <div className="md:col-span-2 space-y-4">
             <div className="flex items-center">
               <img
-                src={s2fLogoFooter}
+                src={footerLogoSrc}
                 alt="Sovereign2Fresh Empire Logo"
                 className="h-16 sm:h-20 w-auto object-contain drop-shadow-xl hover:scale-105 transition-transform"
               />

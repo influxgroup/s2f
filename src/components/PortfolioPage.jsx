@@ -348,7 +348,7 @@ export default function PortfolioPage({ openDiscoveryModal }) {
 
   const rawProjects = Array.isArray(content?.portfolio)
     ? content.portfolio
-    : fallbackCaseStudies;
+    : [];
 
   const caseStudies = rawProjects.map(cs => {
     const stackArray = Array.isArray(cs.stacks)

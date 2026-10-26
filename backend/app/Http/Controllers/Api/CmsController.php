@@ -47,7 +47,7 @@ class CmsController extends Controller
      */
     public function update(Request $request, string $key): JsonResponse
     {
-        $data = $request->input('data', $request->all());
+        $data = $request->has('data') ? $request->input('data') : $request->all();
 
         $content = CmsContent::updateOrCreate(
             ['section_key' => $key],

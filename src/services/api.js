@@ -235,6 +235,38 @@ export async function uploadMedia(file, token, folder = 'cms') {
   }
 }
 
+/**
+ * Update Admin Profile (name, email)
+ */
+export async function updateAdminProfile({ name, email }, token) {
+  if (token && token.startsWith('s2f_local_session_')) {
+    return { success: true, message: 'Profile updated in local session.', data: { user: { name, email } } };
+  }
+  return request('/auth/profile', {
+    method: 'PUT',
+    headers: token ? { Authorization: `Bearer ${token}` } : {},
+    body: JSON.stringify({ name, email }),
+  });
+}
+
+/**
+ * Update Admin Password
+ */
+export async function updateAdminPassword({ current_password, new_password, new_password_confirmation }, token) {
+  if (token && token.startsWith('s2f_local_session_')) {
+    return { success: true, message: 'Password updated successfully in local session.' };
+  }
+  return request('/auth/password', {
+    method: 'PUT',
+    headers: token ? { Authorization: `Bearer ${token}` } : {},
+    body: JSON.stringify({
+      current_password,
+      new_password,
+      new_password_confirmation,
+    }),
+  });
+}
+
 export default {
   checkApiHealth,
   submitInquiry,
@@ -250,6 +282,8 @@ export default {
   fetchAdminConsultations,
   updateConsultationStatus,
   fetchAdminSubscribers,
+  updateAdminProfile,
+  updateAdminPassword,
 };
 
 

@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { ChevronRight, Menu, X, ArrowRight } from 'lucide-react';
+import { useCms } from '../context/CmsContext';
 import s2fLogoHeader from '../assets/s2f_logo_header.png';
 
 /* ─── Social Media Icons (Vibrant Brand Accents) ─── */
@@ -30,7 +31,9 @@ function TikTokIcon({ className = "w-4 h-4" }) {
 }
 
 export default function Navbar({ activeTab, setActiveTab, openDiscoveryModal }) {
+  const { content } = useCms();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const headerLogoSrc = content?.siteSettings?.headerLogo || s2fLogoHeader;
 
   const navItems = [
     { id: 'agency', label: 'Home' },
@@ -82,7 +85,7 @@ export default function Navbar({ activeTab, setActiveTab, openDiscoveryModal }) 
           onClick={() => handleNavClick('agency')}
         >
           <img
-            src={s2fLogoHeader}
+            src={headerLogoSrc}
             alt="Sovereign2Fresh Empire"
             className="h-8 sm:h-9 w-auto object-contain transition-transform group-hover:scale-105 drop-shadow-sm"
           />
