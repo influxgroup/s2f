@@ -8,8 +8,9 @@ export default function Footer({ setActiveTab, openDiscoveryModal }) {
   const contact = cms?.content?.contact || {};
   const phone = contact.phone || '+234 (0) 800-723-3674';
   const email = contact.email || 'info@sovereign2freshempire.com';
-  const address = contact.officeAddress || 'Abuja, Federal Capital Territory, Nigeria';
-  const footerLogoSrc = cms?.content?.siteSettings?.footerLogo || s2fLogoFooter;
+  const footerLogoSrc = (cms?.content?.siteSettings?.footerLogo && !cms.content.siteSettings.footerLogo.includes('/s2f_logo_footer.png'))
+    ? cms.content.siteSettings.footerLogo
+    : s2fLogoFooter;
 
   const handleNavClick = (tab) => {
     setActiveTab(tab);
@@ -58,6 +59,7 @@ export default function Footer({ setActiveTab, openDiscoveryModal }) {
               <img
                 src={footerLogoSrc}
                 alt="Sovereign2Fresh Empire Logo"
+                onError={(e) => { e.currentTarget.onerror = null; e.currentTarget.src = s2fLogoFooter; }}
                 className="h-16 sm:h-20 w-auto object-contain drop-shadow-xl hover:scale-105 transition-transform"
               />
             </div>

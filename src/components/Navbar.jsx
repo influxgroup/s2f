@@ -33,7 +33,9 @@ function TikTokIcon({ className = "w-4 h-4" }) {
 export default function Navbar({ activeTab, setActiveTab, openDiscoveryModal }) {
   const { content } = useCms();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-  const headerLogoSrc = content?.siteSettings?.headerLogo || s2fLogoHeader;
+  const headerLogoSrc = (content?.siteSettings?.headerLogo && !content.siteSettings.headerLogo.includes('/s2f_logo_header.png'))
+    ? content.siteSettings.headerLogo
+    : s2fLogoHeader;
 
   const navItems = [
     { id: 'agency', label: 'Home' },
@@ -87,6 +89,7 @@ export default function Navbar({ activeTab, setActiveTab, openDiscoveryModal }) 
           <img
             src={headerLogoSrc}
             alt="Sovereign2Fresh Empire"
+            onError={(e) => { e.currentTarget.onerror = null; e.currentTarget.src = s2fLogoHeader; }}
             className="h-8 sm:h-9 w-auto object-contain transition-transform group-hover:scale-105 drop-shadow-sm"
           />
         </div>

@@ -1,5 +1,7 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { fetchCmsContent, bulkSaveCms, saveCmsSection, loginAdmin } from '../services/api';
+import s2fLogoHeader from '../assets/s2f_logo_header.png';
+import s2fLogoFooter from '../assets/s2f_logo_footer.png';
 
 // Comprehensive factory defaults mirroring the live website
 export const initialCmsDefaults = {
@@ -722,8 +724,8 @@ export const initialCmsDefaults = {
   siteSettings: {
     siteTitle: 'Sovereign2Fresh Empire | Enterprise IT Solutions & Custom Software Development',
     metaDescription: 'Sovereign2Fresh Empire delivers world-class enterprise IT solutions, bespoke software development, cloud infrastructure, and mission-critical cybersecurity for commercial businesses, government institutions, and private firms.',
-    headerLogo: '/s2f_logo_header.png',
-    footerLogo: '/s2f_logo_footer.png',
+    headerLogo: s2fLogoHeader,
+    footerLogo: s2fLogoFooter,
     favicon: '/favicon.png',
     ogImage: '/s2f_og_preview.png',
     adminEmail: 'admin@sovereign2freshempire.com',
@@ -806,6 +808,12 @@ export function CmsProvider({ children }) {
           };
         }
         if (parsed.siteSettings) {
+          if (parsed.siteSettings.headerLogo?.includes('/s2f_logo_header.png') || !parsed.siteSettings.headerLogo) {
+            parsed.siteSettings.headerLogo = s2fLogoHeader;
+          }
+          if (parsed.siteSettings.footerLogo?.includes('/s2f_logo_footer.png') || !parsed.siteSettings.footerLogo) {
+            parsed.siteSettings.footerLogo = s2fLogoFooter;
+          }
           parsed.siteSettings = { ...initialCmsDefaults.siteSettings, ...parsed.siteSettings };
         }
         delete parsed.vetting;
