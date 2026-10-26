@@ -765,13 +765,21 @@ export function CmsProvider({ children }) {
             return d;
           });
         }
+        // Automatically purge stale legacy sample dummy portfolio projects and sample blog articles from browser cache
+        if (Array.isArray(parsed.portfolio) && parsed.portfolio.some(p => p.title === 'CV Transformer (AI SaaS Platform)' || p.title?.includes('Zeenab Foods'))) {
+          parsed.portfolio = [];
+        }
+        if (Array.isArray(parsed.blog) && parsed.blog.some(b => b.title?.includes('Bridging the Global Tech Gap') || b.title?.includes('Vetting Playbook'))) {
+          parsed.blog = [];
+        }
+
         // Only fallback to default blog if blog is not an array at all (e.g. uninitialized)
         // If the user intentionally deleted articles resulting in an empty array [], respect the deletion.
         if (!Array.isArray(parsed.blog)) {
-          parsed.blog = initialCmsDefaults.blog;
+          parsed.blog = [];
         }
         if (!Array.isArray(parsed.portfolio)) {
-          parsed.portfolio = initialCmsDefaults.portfolio;
+          parsed.portfolio = [];
         }
         if (!parsed.cybersecurity) {
           parsed.cybersecurity = initialCmsDefaults.cybersecurity;
