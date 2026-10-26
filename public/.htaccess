@@ -1,6 +1,22 @@
+DirectoryIndex index.html index.php
+
 <IfModule mod_rewrite.c>
   RewriteEngine On
-  RewriteBase /dist/
+  RewriteBase /
+
+  # 1. Backend API routing
+  RewriteCond %{REQUEST_URI} ^/api/
+  RewriteRule ^api/(.*)$ backend/public/index.php [L,QSA]
+
+  # 2. Uploaded media routing
+  RewriteCond %{REQUEST_URI} ^/storage/
+  RewriteRule ^storage/(.*)$ backend/public/storage/$1 [L,QSA]
+
+  # 3. Exclude backend folder
+  RewriteCond %{REQUEST_URI} ^/backend/
+  RewriteRule ^ - [L]
+
+  # 4. SPA Routing: route all frontend paths to index.html
   RewriteCond %{REQUEST_FILENAME} !-f
   RewriteCond %{REQUEST_FILENAME} !-d
   RewriteRule ^.*$ index.html [L]
@@ -10,4 +26,6 @@
   AddType application/javascript .js .mjs
   AddType text/css .css
   AddType image/svg+xml .svg
+  AddType image/webp .webp
+  AddType image/png .png
 </IfModule>
