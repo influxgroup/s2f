@@ -8,6 +8,7 @@ export default function Footer({ setActiveTab, openDiscoveryModal }) {
   const contact = cms?.content?.contact || {};
   const phone = contact.phone || '+234 (0) 800-723-3674';
   const email = contact.email || 'info@sovereign2freshempire.com';
+  const address = contact.officeAddress || contact.address || 'Abuja, Federal Capital Territory, Nigeria';
   const footerLogoSrc = (cms?.content?.siteSettings?.footerLogo && !cms.content.siteSettings.footerLogo.includes('/s2f_logo_footer.png'))
     ? cms.content.siteSettings.footerLogo
     : s2fLogoFooter;
