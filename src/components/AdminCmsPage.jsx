@@ -2232,8 +2232,8 @@ function PortfolioEditor({ portfolio = [], onSave, adminToken }) {
       title: 'New Client Enterprise Project',
       client: 'Global Technology Client',
       category: 'AI & Enterprise',
-      flag: '🇬🇧',
-      liveUrl: 'https://sovereign2freshempire.com',
+      flag: '🌐',
+      liveUrl: '',
       images: ['https://images.unsplash.com/photo-1551288049-bebda4e38f71?auto=format&fit=crop&w=1200&q=80'],
       stacks: 'React, Node.js, PostgreSQL, AWS',
       metric1Label: 'Performance',
@@ -2286,6 +2286,19 @@ function PortfolioEditor({ portfolio = [], onSave, adminToken }) {
                   <h3 className="text-sm font-bold text-slate-900">{item.title}</h3>
                   <p className="text-xs text-slate-500 line-clamp-2 leading-relaxed">{item.summary}</p>
                   <p className="text-[11px] text-slate-400 font-mono">Tech Stack: {item.stacks}</p>
+                  {(item.liveUrl || item.url) ? (
+                    <a
+                      href={item.liveUrl || item.url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="inline-flex items-center gap-1.5 text-xs text-blue-600 hover:text-blue-800 font-mono hover:underline pt-0.5"
+                    >
+                      <ExternalLink className="w-3 h-3 shrink-0" />
+                      <span className="truncate max-w-sm">{item.liveUrl || item.url}</span>
+                    </a>
+                  ) : (
+                    <span className="text-[11px] text-slate-400 italic">No public URL provisioned (Internal / Proprietary)</span>
+                  )}
                 </div>
 
                 <div className="flex items-center gap-2 self-end sm:self-center shrink-0">
@@ -2367,6 +2380,20 @@ function PortfolioForm({ data, onSave, onCancel, adminToken }) {
           value={formData.summary || ''}
           onChange={(e) => setFormData({ ...formData, summary: e.target.value })}
           className="w-full px-3 py-1.5 rounded-lg border border-slate-300 text-slate-900 text-xs focus:border-blue-600"
+        />
+      </div>
+
+      <div className="space-y-1">
+        <div className="flex items-center justify-between">
+          <label className="text-[11px] font-semibold text-slate-700">Live Project / Website URL</label>
+          <span className="text-[10px] text-slate-400 font-normal">Optional — leave blank if private or proprietary</span>
+        </div>
+        <input
+          type="text"
+          placeholder="e.g. https://privatejethomes.com"
+          value={formData.liveUrl || formData.url || ''}
+          onChange={(e) => setFormData({ ...formData, liveUrl: e.target.value, url: e.target.value })}
+          className="w-full px-3 py-1.5 rounded-lg border border-slate-300 text-slate-900 text-xs focus:border-blue-600 font-mono"
         />
       </div>
 

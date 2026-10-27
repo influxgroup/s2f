@@ -1,6 +1,7 @@
 import React from 'react';
 import { ArrowRight, ExternalLink, Briefcase, CheckCircle2 } from 'lucide-react';
 import { useCms } from '../context/CmsContext';
+import { formatExternalUrl } from '../utils/urlHelper';
 
 export default function FeaturedPortfolio({ setActiveTab, openDiscoveryModal }) {
   const { content } = useCms();
@@ -108,6 +109,8 @@ export default function FeaturedPortfolio({ setActiveTab, openDiscoveryModal }) 
 
             const coverImage = project.image || (Array.isArray(project.images) && project.images[0]) || 'https://images.unsplash.com/photo-1551288049-bebda4e38f71?auto=format&fit=crop&w=800&q=80';
 
+            const projectLiveUrl = formatExternalUrl(project.liveUrl || project.url || project.projectUrl);
+
             return (
               <div
                 key={project.id || idx}
@@ -169,9 +172,27 @@ export default function FeaturedPortfolio({ setActiveTab, openDiscoveryModal }) 
                     ))}
                   </div>
 
-                  <div className="flex items-center justify-between text-xs font-semibold text-blue-600 group-hover:text-blue-700 transition-colors pt-0.5">
-                    <span>Explore Case Study</span>
-                    <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-1 transition-transform" />
+                  <div className="flex items-center justify-between gap-2 text-xs font-semibold pt-0.5">
+                    <span className="text-blue-600 group-hover:text-blue-700 transition-colors inline-flex items-center gap-1">
+                      <span>Explore Case Study</span>
+                      <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-1 transition-transform" />
+                    </span>
+
+                    {projectLiveUrl ? (
+                      <a
+                        href={projectLiveUrl}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        onClick={(e) => e.stopPropagation()}
+                        className="inline-flex items-center gap-1 px-2.5 py-1 rounded-md bg-blue-50 hover:bg-blue-100 text-blue-700 hover:text-blue-900 text-[11px] font-semibold border border-blue-200/80 transition-colors cursor-pointer shadow-2xs"
+                        title={`Open live site for ${project.title}`}
+                      >
+                        <span>Visit Site</span>
+                        <ExternalLink className="w-3 h-3" />
+                      </a>
+                    ) : (
+                      <span className="text-[10px] text-slate-400 font-normal">Internal System</span>
+                    )}
                   </div>
                 </div>
               </div>
